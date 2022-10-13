@@ -10,6 +10,7 @@ import Caver from "caver-js";
 import {isTestNet} from "../utils/web3/networks";
 import {store} from "../store";
 import {CHANGE_ADDRESS} from "../store/actions/walletAddress";
+import LarvaNFTBreeding from "../components/larva_nft_breeding/LarvaNFTBreeding";
 
 function Index() {
 
@@ -158,6 +159,11 @@ function Index() {
             <Switch>
                 <Route exact path="/">
                     <Home accounts={accounts} apiToken={apiToken} isConnected={isConnectedWallet} networkId={networkId}
+                          handleKaikasConnect={() => connectKaikas()}
+                          handleLogout={() => logout()}/>
+                </Route>
+                <Route exact path="/breeding">
+                    <LarvaNFTBreeding accounts={accounts} apiToken={apiToken} isConnected={isConnectedWallet} networkId={networkId}
                           handleKaikasConnect={() => connectKaikas()}
                           handleLogout={() => logout()}/>
                 </Route>

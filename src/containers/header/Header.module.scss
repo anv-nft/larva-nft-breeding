@@ -1,9 +1,17 @@
 .header{
-  position: absolute;
   width: 100%;
+  background-color: #000;
   display : flex;
   justify-content: space-between;
   align-items: center;
+  a{
+    text-decoration: none;
+    color: #FFF;
+  }
+  a:hover{
+    color: #6f42c1;
+    text-decoration: none;
+  }
   @media screen and (max-width: 500px) {
     flex-wrap: wrap;
     justify-content: center;

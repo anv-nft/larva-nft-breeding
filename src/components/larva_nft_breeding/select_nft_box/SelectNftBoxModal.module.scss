@@ -1,0 +1,58 @@
+#myNftBox{
+  width: 70%!important;
+  max-width: none;
+  div{border-radius: 0;}
+  .select_nft_box{
+    max-height: 80vh;
+    overflow-y: scroll;
+    background-color: #6f42c1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    img{
+      max-width: 200px;
+      max-height: 200px;
+    }
+    .nft_box{
+      max-width: 240px;
+      padding: 20px 20px 10px 20px;
+      margin: 10px;
+      background-color: #fff;
+      border-radius: 15px;
+      box-sizing: border-box;
+      text-align: center;
+      display: inline-block;
+      cursor: pointer;
+      p{
+        margin: 0;
+      }
+      span{
+        display: inline-block;
+        margin-top: 10px;
+        font-weight: 700;
+      }
+    }
+    .selected_box{
+      position: relative;
+      cursor: none!important;
+      img{
+      filter: grayscale(80%);
+        opacity: 0.2;
+      }
+      >span{
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+        top: 10%;
+        left: 0;
+        color: #FFF;
+        background-color: red;
+      }
+    }
+    .active{
+      border: 2px solid red;
+    }
+  }
+}
+
