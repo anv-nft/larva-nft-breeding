@@ -1,29 +1,36 @@
-import React, { useEffect, useRef, useState} from 'react'
-import {BrowserRouter,  Route, Switch} from 'react-router-dom'
+import React, {useEffect, useRef, useState} from 'react'
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
 import Header from "../containers/header/Header";
 import Footer from "../containers/footer/Footer";
 import Home from "../components/home/Home";
 import {GET, POST} from "../api/api";
 import {useWeb3React} from "@web3-react/core";
-import { kaikasConnector} from "../utils/web3/connectors";
+import {kaikasConnector} from "../utils/web3/connectors";
 import Caver from "caver-js";
 import {isTestNet} from "../utils/web3/networks";
 import {store} from "../store";
 import {CHANGE_ADDRESS} from "../store/actions/walletAddress";
 import LarvaNFTBreeding from "../components/larva_nft_breeding/LarvaNFTBreeding";
-
+import {useTranslation} from "react-i18next";
+import i18next from "../lang/i18n";
 function Index() {
-
-    const {account, active, activate, chainId, deactivate} = useWeb3React();
+    const {t} = useTranslation();
+    const {account, active, activate, deactivate} = useWeb3React();
     const didMount = useRef(true);
     const [accounts, setAccounts] = useState([]);
     const [apiToken, setApiToken] = useState(null);
     const [networkId, setNetworkId] = useState(1);
     const [isConnectedWallet, setConnectWallet] = useState(undefined);
+    const [language, setLanguage] = useState("ko");
 
+    const langChangeHandler = (lang) =>{
+        setLanguage(lang);
+        i18next.changeLanguage(lang);
+    }
 
     useEffect(() => {
         const isConnected = window.localStorage.getItem("isConnected");
+        console.log(isConnected);
         if (isConnected === 'YES') {
             connectKaikas();
         } else {
@@ -32,19 +39,23 @@ function Index() {
         checkWalletClosed();
     }, []);
 
-    useEffect(async () => { // CHECK CONNECTION
+
+    useEffect(() => { // CHECK CONNECTION
+        async function logoutEffect() {
+            await logout();
+        }
         if (didMount.current) {
             didMount.current = false;
-            return;
+            // return;
         }
         if (!active) {
-            await logout();
+            logoutEffect();
         }
         // 새고로침시 로그아웃 되는 로직개선
         if (account) {
             const storeAddress = store.getState().wallet.address;
             if (storeAddress !== account.toLowerCase()) {
-                await logout();
+                logoutEffect();
             }
         }
     }, [active, account]);
@@ -70,7 +81,7 @@ function Index() {
         let tempAccounts = [];
         tempAccounts.push(account);
         setAccounts(tempAccounts);
-        store.dispatch(CHANGE_ADDRESS(account,chainId));
+        store.dispatch(CHANGE_ADDRESS(account, chainId));
         setNetworkId(chainId);
         window.localStorage.setItem('isConnected', 'YES');
     }
@@ -82,15 +93,15 @@ function Index() {
 
                 const accounts = await window.klaytn.enable();
                 const account = accounts[0]
-                if(!isTestNet){
-                    if(window.klaytn.networkVersion !== 8217){
+                if (!isTestNet) {
+                    if (window.klaytn.networkVersion !== 8217) {
                         alert('Please switch your wallet to the mainnet.');
                         throw 'error';
                     }
                 }
 
                 const token = localStorage.getItem('aniverse_token');
-                if(token === null){
+                if (token === null) {
                     //토큰생성
                     const res = await GET(`/api/v1/auth/larva_reveal/${account}/uuid`);
                     // sign
@@ -98,14 +109,14 @@ function Index() {
                     const provider = window['klaytn'];
                     const caver = new Caver(provider);
                     //서명받기
-                    await caver.klay.sign(message, account).then(async (message)=>{
+                    await caver.klay.sign(message, account).then(async (message) => {
                         // get JWT
                         // jwt = await requestSignin(address, signedMessage);
                         await POST(`/api/v1/auth/larva_reveal/signin`, {
                             address: account,
                             message
                         }).then((sign) => {
-                            localStorage.setItem('aniverse_token',  sign.token);
+                            localStorage.setItem('aniverse_token', sign.token);
                             setApiToken(sign.token);
                             loadWalletAttributes(account, window.klaytn.networkVersion);
                         });
@@ -113,12 +124,12 @@ function Index() {
                     });
 
 
-                } else if(token){
-                    const tokenCheck = await POST(`/api/v1/auth/tokencheck`,{address: account},token);
-                    if(tokenCheck.result === 'success' && tokenCheck.address === account){
+                } else if (token) {
+                    const tokenCheck = await POST(`/api/v1/auth/tokencheck`, {address: account}, token);
+                    if (tokenCheck.result === 'success' && tokenCheck.address === account) {
                         setApiToken(token);
                         loadWalletAttributes(account, window.klaytn.networkVersion);
-                    }else {
+                    } else {
                         await logout();
                     }
                 } else {
@@ -150,26 +161,24 @@ function Index() {
             console.log(e);
         }
     }
-
     return (
 
-        <BrowserRouter>
+        <Router>
             <Header accounts={accounts} apiToken={apiToken} isConnected={isConnectedWallet} networkId={networkId}
-                    handleKaikasConnect={() => connectKaikas()} handleLogout={() => logout()} />
-            <Switch>
-                <Route exact path="/">
-                    <Home accounts={accounts} apiToken={apiToken} isConnected={isConnectedWallet} networkId={networkId}
-                          handleKaikasConnect={() => connectKaikas()}
-                          handleLogout={() => logout()}/>
+                    handleKaikasConnect={() => connectKaikas()} handleLogout={() => logout()} langChangeHandler={langChangeHandler}  t={t} language={language}/>
+            <Routes>
+                <Route exact path="/"
+                       element={<Home t={t}/>}>
                 </Route>
-                <Route exact path="/breeding">
-                    <LarvaNFTBreeding accounts={accounts} apiToken={apiToken} isConnected={isConnectedWallet} networkId={networkId}
-                          handleKaikasConnect={() => connectKaikas()}
-                          handleLogout={() => logout()}/>
+                <Route exact path="/breeding" element={<LarvaNFTBreeding accounts={accounts} apiToken={apiToken}
+                                                                         isConnected={isConnectedWallet}
+                                                                         networkId={networkId}
+                                                                         handleKaikasConnect={() => connectKaikas()}
+                                                                         handleLogout={() => logout()}/>}>
                 </Route>
-            </Switch>
+            </Routes>
             <Footer/>
-        </BrowserRouter>
+        </Router>
     )
 }
 

@@ -1,6 +1,28 @@
 .footer{
+  padding: 210px 50px 110px 50px;
   width: 100%;
-  border-top: 1px solid #000;
-  color: #4f4f4f;
-  text-align: center;
+  background-color: #13002e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  div{
+    width: 33%;
+    text-align: center;
+  }
+  .icon_list{
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
+    a{
+      cursor: pointer;
+    }
+  }
+  .copyright{
+    color: #888888;
+  }
+}
+.breeding_footer{
+  padding: 110px 50px;
+  background-color: #5c00b6!important;
+  p{color: #FFF!important;}
 }

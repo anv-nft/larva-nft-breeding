@@ -1,5 +1,12 @@
+body{
+    background-color: #5500B7;
+    min-width: 1650px;
+    max-width: 1920px;
+    margin: 0 auto;
+}
 .modal-content{
     border-radius: 3rem;
+    border: none;
 }
 .modal-90w{
     width: 80%;

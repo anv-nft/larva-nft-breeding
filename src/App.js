@@ -3,6 +3,7 @@ import Routers from "./router"
 /* CSS */
 import './assets/css/bootstrap.css'
 import './assets/css/common.css'
+import './assets/css/font.css'
 console.log(`                                                                                                                                                                     
 %c █████╗ ███╗   ██╗██╗██╗   ██╗███████╗██████╗ ███████╗███████╗
 %c██╔══██╗████╗  ██║██║██║   ██║██╔════╝██╔══██╗██╔════╝██╔════╝
