@@ -75,7 +75,7 @@ export default function Home(props) {
                     <div className={styles.story_content}>
                         <img data-aos="fade-down" data-aos-duration="3000" src={StoryVisual} alt="StoryVisual"/>
                         <div data-aos="zoom-in" data-aos-duration="2000">
-                            <h2>STORY</h2>
+                            <h2>{props.t("story_title")}</h2>
                             <p>
                                 {props.t("story_01").split("\n").map((line,index) => (<span key={index}>{line}</span>))}
                                 <br/>
@@ -92,7 +92,7 @@ export default function Home(props) {
 
             </section>
             <section className={styles.roadmap_section} id="ROADMAP">
-                <h2>ROAD MAP</h2>
+                <h2>{props.t("ROADMAP")}</h2>
                 <div className={styles.roadmap_box}>
                     <div data-aos="flip-right" className={`${styles.item} ${styles.complete}`}>
                         <p className={styles.num}><span>01</span></p>
