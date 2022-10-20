@@ -6,7 +6,6 @@ import "aos/dist/aos.css";
 import LoadingModal from "../loading_modal/LoadingModal"
 import styles from "./LarvaNFTBreeding.module.scss"
 import breedIntro from "../../assets/images/breeding/breed_intro.mp4";
-import {ERC721} from "../../utils/abi/ERC721";
 import {PAUSABLE_NFT} from "../../utils/abi/PAUSABLE_NFT";
 import {BREEDING_ABI} from "../../utils/abi/BREEDING_ABI";
 import {contracts} from "../../utils/web3/contracts";
@@ -56,11 +55,8 @@ function LarvaNFTBreeding(props) {
 
     const provider = window['klaytn'];
     const caver = new Caver(provider);
-    // const CURRENT_NFT_CONTRACT_ADDRESS = contracts['current_nft_contract'][props.networkId];
-    // const REVEAL_CONTRACT_ADDRESS = contracts['reveal_contract'][props.networkId];
     const BREEDING_CONTRACT_ADDRESS = contracts['breeding_contract'][props.networkId];
     const PFP_3D_NFT_CONTRACT_ADDRESS = contracts['pfp_3d_nft_contract'][props.networkId];
-    // const currentNftContract = new caver.klay.Contract(ERC721, CURRENT_NFT_CONTRACT_ADDRESS);
     const breedingContract = new caver.klay.Contract(BREEDING_ABI, BREEDING_CONTRACT_ADDRESS);
     const nftContract = new caver.klay.Contract(PAUSABLE_NFT, PFP_3D_NFT_CONTRACT_ADDRESS);
 
@@ -334,7 +330,7 @@ function LarvaNFTBreeding(props) {
                     <div>
                         <label className={styles.input_box}>
                             <span>Token ID</span>
-                            <input ref={searchTokenIdInput} type="text" name="tokenId" value={searchTokenIdInput} maxLength="4"
+                            <input ref={searchTokenIdInput} type="text" name="tokenId" value={searchTokenId} maxLength="4"
                                    onChange={numberCheck} placeholder={"Please enter Token ID"}/>
                             <button onClick={() => {
                                 tokenIdTimeCheck()

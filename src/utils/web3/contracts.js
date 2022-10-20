@@ -1,11 +1,15 @@
 const contracts = {
+    larva_kids_contract: {
+        1001: "0xdf95b2aBD60EA66A530485a460eC199E0455208a",  // klaytn testnet
+        8217: "",  // klaytn mainnet
+    },
     breeding_contract: {
-        1001: "0x051ccd21cf8f60926e071904c6e164497a7ef472",  // klaytn testnet
+        1001: "0x066CcfA3f04220724481628A3032bd6aE53b1387",  // klaytn testnet
         8217: "",  // klaytn mainnet
     },
     pfp_3d_nft_contract: {
-        1001: "0x9b8183870a31f33da269864f5c35636a4b5e0ceb",  // klaytn testnet
-        8217: "0xe013a4dd240b4e4821148ff786cfa050d60182bb",  // klaytn mainnet
+        1001: "0x7957753231959287B22685A4d7f40D262C556b6f",  // klaytn testnet
+        8217: "",  // klaytn mainnet
     },
 };
 
