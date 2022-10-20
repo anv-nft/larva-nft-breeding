@@ -3,31 +3,35 @@ import {Modal} from 'react-bootstrap';
 import {POST} from "../../../api/api";
 import styles from "./SelectNftBoxModal.module.scss"
 import iconX from "../../../assets/images/icon/icon_x_s.png";
+
 function SelectNftBoxModal(props) {
     const [selectModal, setSelectModal] = useState(false);
     const [listItem, setListItem] = useState([]);
-    const [selectedBox, setSelectedBox] = useState("");
+    const [selectedNft, setSelectedNft] = useState("");
 
     function selectNft(e) {
         const box = e.currentTarget;
-        if (selectedBox !== "") {
-            selectedBox.classList.remove(styles.active);
+        if (selectedNft !== "") {
+            selectedNft.classList.remove(styles.active);
         }
-        console.log(box.childNodes[0].src);
-        setSelectedBox(box);
+        setSelectedNft(box);
         box.classList.add(styles.active);
     }
 
     function selectComplete() {
-        console.log(selectedBox.childNodes[1]);
-        console.log(selectedBox.childNodes[1].childNodes[1]);
-        console.log(selectedBox.childNodes[1].childNodes[1].innerText);
         if (props.selectSequence === 1) {
-            props.setFirstTokenId(selectedBox.childNodes[1].childNodes[1].innerText);
-            props.setFirstTokenImg(selectedBox.childNodes[0].src);
+            props.setFirstToken({
+                id: selectedNft.childNodes[1].childNodes[1].innerText,
+                img: selectedNft.childNodes[0].src,
+                character: selectedNft.childNodes[2].innerText,
+            });
         } else {
-            props.setSecondTokenId(selectedBox.childNodes[1].childNodes[1].innerText);
-            props.setSecondTokenImg(selectedBox.childNodes[0].src);
+            props.setSecondToken({
+                id: selectedNft.childNodes[1].childNodes[1].innerText,
+                img: selectedNft.childNodes[0].src,
+                character: selectedNft.childNodes[2].innerText,
+            });
+
         }
         props.setSelectBox(false);
     }
@@ -44,14 +48,14 @@ function SelectNftBoxModal(props) {
                 console.log(result);
                 if (result.result === 'success') {
                     result.data.forEach((key, value) => {
-                        if ('0x' + parseInt(props.firstTokenId).toString(16) === key.tokenId) {
-                            result.data[value].selected = true;
+                        if (props.firstToken.character === key.character || props.secondToken.character === key.character) {
+                            result.data[value].status = 'same character';
                         }
-                        if ('0x' + parseInt(props.secondTokenId).toString(16) === key.tokenId) {
-                            result.data[value].selected = true;
+                        if ('0x' + parseInt(props.firstToken.id).toString(16) === key.tokenId) {
+                            result.data[value].status = 'selected';
                         }
-                        if ('0x' + parseInt(props.secondTokenId).toString(16) === key.tokenId) {
-                            result.data[value].selected = true;
+                        if ('0x' + parseInt(props.secondToken.id).toString(16) === key.tokenId) {
+                            result.data[value].status = 'selected';
                         }
                     })
                     setListItem(result.data);
@@ -73,11 +77,11 @@ function SelectNftBoxModal(props) {
                     <h3>
                         My NFT Collection book
                         <div>
-                            {(selectedBox) ? (
+                            {(selectedNft) ? (
                                 <div className={styles.on_status} onClick={() => selectComplete()}>
                                     breed
                                 </div>
-                            ):(
+                            ) : (
                                 <div className={styles.off_status}>
                                     0 / 1
                                 </div>
@@ -91,19 +95,20 @@ function SelectNftBoxModal(props) {
                 <div className={styles.select_nft_box}>
                     {
                         listItem.map((nft) => (
-                            (nft.selected === true) ? (
+                            (nft.status) ? (
                                 <div key={nft.tokenId} className={`${styles.nft_box} ${styles.selected_box}`}>
                                     <img className={styles.nft_img} src={nft.image} alt={nft.tokenId}/>
                                     <span>#<span>{parseInt(nft.tokenId, 16)}</span> Larva</span>
-                                    <span>SELECTED</span>
+                                    <span className={styles.hide}>{nft.character}</span>
+                                    <span>{nft.status}</span>
                                 </div>
-
                             ) : (
                                 <div key={nft.tokenId} className={styles.nft_box} onClick={(event) => {
                                     selectNft(event)
                                 }}>
                                     <img className={styles.nft_img} src={nft.image} alt={nft.tokenId}/>
                                     <span>#<span>{parseInt(nft.tokenId, 16)}</span> Larva</span>
+                                    <span className={styles.hide}>{nft.character}</span>
                                 </div>
                             )
                         ))

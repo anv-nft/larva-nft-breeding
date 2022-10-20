@@ -37,25 +37,23 @@ function LarvaNFTBreeding(props) {
     const [showBreedingModal, setShowBreedingModal] = useState(false); // 브리딩 확인 모달
     const [showBreedingResultModal, setShowBreedingResultModal] = useState(false); // 브리딩 완료 모달
     const [alerts, setAlerts] = useState(""); // 알림 메세지
+    function closeAlert() {
+        setShowAlertModal(false);
+        setAlerts("");
+    }
+    function closeBreedingResultModal() {
+        setShowBreedingResultModal(false);
+        setBreedingNftTokenId("");
+        setBreedingNftImg("");
+    }
 
-    const [firstTokenId, setFirstTokenId] = useState(""); // 1번 선택된 토큰 ID
-    const [firstTokenImg, setFirstTokenImg] = useState(""); // 1번 선택된 토큰 ID 이미지 URL
+    const [firstToken, setFirstToken] = useState({id:'',img:'',character:''}); // 1번 선택된 토큰 ID
     const [firstHover, setFirstHover] = useState(false); // 1번 선택된 박스 마우스 hover 상태
-    const [secondTokenId, setSecondTokenId] = useState(""); // 2번 선택된 토큰 ID
-    const [secondTokenImg, setSecondTokenImg] = useState("") ;// 2번 선택된 토큰 ID 이미지 URL
+    const [secondToken, setSecondToken] = useState({id:'',img:'',character:''}); // 2번 선택된 토큰 ID
     const [secondHover, setSecondHover] = useState(false); // 2번 선택된 박스 마우스 hover 상태
     const [breedingNftTokenId, setBreedingNftTokenId] = useState(""); // 브리딩 성공한 NFT 토큰 ID
     const [breedingNftImg, setBreedingNftImg] = useState(""); // 브리딩 성공한 NFT 토큰 ID 이미지 URL
 
-    const tokenIdInput = useRef(); // 타임 검색용 토큰 ID
-    const [tokenId, setTokenId] = useState(""); // 타임 검색용 토큰 ID
-    // 숫자인지 체크
-    const numberCheck = (e) => {
-        const regex = /^[0-9\b -]{0,13}$/;
-        if (regex.test(e.target.value)) {
-            setTokenId(e.target.value);
-        }
-    }
     const provider = window['klaytn'];
     const caver = new Caver(provider);
     // const CURRENT_NFT_CONTRACT_ADDRESS = contracts['current_nft_contract'][props.networkId];
@@ -67,20 +65,117 @@ function LarvaNFTBreeding(props) {
     const nftContract = new caver.klay.Contract(PAUSABLE_NFT, PFP_3D_NFT_CONTRACT_ADDRESS);
 
     function breedTokenIdCheck() {
-        if (firstTokenId === "" || secondTokenId === "") {
+        if (firstToken.id === "" || secondToken.id === "") {
             setAlerts("Please select your NFT.");
             setShowAlertModal(true);
             return false;
         }
         return true;
     }
+
+    const searchTokenIdInput = useRef(); // 타임 검색용 토큰 ID
+    const [searchTokenId, setSearchTokenId] = useState(""); // 타임 검색용 토큰 ID
+    // 숫자인지 체크
+    const numberCheck = (e) => {
+        const regex = /^[0-9\b -]{0,13}$/;
+        if (regex.test(e.target.value)) {
+            setSearchTokenId(e.target.value);
+        }
+    }
+
     function searchTokenIdCheck() {
-        if (tokenIdInput.current.value === "") {
+        if (searchTokenIdInput.current.value === "") {
             setAlerts("Please enter your token ID.");
             setShowAlertModal(true);
-            tokenIdInput.current.focus();
+            searchTokenIdInput.current.focus();
             return false;
         }
+        return true;
+    }
+
+    async function tokenIdTimeCheck() {
+        if (!searchTokenIdCheck()) {
+            return false;
+        }
+        try {
+            const coolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, searchTokenId).call().then(e => {
+                return e;
+            });
+            console.log(coolTime);
+        } catch (e) {
+            setAlerts("Please check the tokenID");
+            setShowAlertModal(true);
+            return false
+        }
+        return false
+    }
+    // 브리딩 실행
+    async function nftBreeding() {
+        if (!breedTokenIdCheck()) {
+            return false;
+        }
+        let breedingIdx;
+        let breedingResult;
+        let alertMsg = `Token ID ${firstToken.id} + ${secondToken.id} breed Success`; // 에러메세지
+        try {
+            // api 호출전 히스토리 요청
+            const breedingBeforeResult = await POST(`/api/v1/larvaBreeding/log_before`, {
+                firstTokenId: firstToken.id,
+                secondTokenId: secondToken.id,
+                address: props.accounts[0],
+            }, props.apiToken);
+            console.log(breedingBeforeResult)
+            if (breedingBeforeResult.result === 'error') {
+                throw new Error(breedingBeforeResult.error);
+            }
+            breedingIdx = breedingBeforeResult.data.idx;
+            if(breedingIdx){
+                // 브리딩 실행
+                try {
+                    const gasLimit = await breedingContract.methods.breed(firstToken.id, secondToken.id).estimateGas({
+                        from: props.accounts[0],
+                    })
+                    const gasPrice = await caver.rpc.klay.getGasPrice();
+                    breedingResult = await breedingContract.methods.breed(firstToken.id, secondToken.id).send({
+                        from: props.accounts[0],
+                        gas: gasLimit,
+                        gasPrice,
+                    });
+                    console.log(breedingResult); // 브리딩 결과값
+                    setBreedingNftTokenId(""); // todo : 완료 토큰 및 이미지
+                    setBreedingNftImg("");
+                    breedIntroPlay();
+                } catch (e) {
+                    console.log(e);
+                    setAlerts("breeding Fail ");
+                    setShowAlertModal(true);
+                    setShowBreedingModal(false);
+                }
+                // api 호출후 히스토리 요청
+                try {
+                    const breedingAfterResult = await POST(`/api/v1/larvaBreeding/log_after`, {
+                        breedingIdx,
+                        txHash: breedingResult.transactionHash,
+                        address: props.accounts[0],
+                    }, props.apiToken);
+                    console.log(breedingAfterResult)
+                    if (breedingAfterResult.result === 'error') {
+                        throw new Error(breedingAfterResult.error);
+                    }
+
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        } catch (e) {
+            console.log(e);
+            setAlerts("breeding History Save Fail ");
+            setShowAlertModal(true);
+            setShowBreedingModal(false);
+        }
+
+
+
         return true;
     }
     const [breedIntroStatus, setBreedIntroStatus] = useState(false);
@@ -88,93 +183,27 @@ function LarvaNFTBreeding(props) {
     function breedIntroPlay() {
         const breedIntro = document.getElementById('breed_intro');
         setBreedIntroStatus(true);
-        setShowAlertModal(true);
         setShowBreedingResultModal(true);
         initSelected()
         breedIntro.play();
     }
     // 전체 선택초기화
-    function initSelected(){
+    function initSelected() {
         setShowBreedingModal(false);
-        setFirstTokenId("");
-        setFirstTokenImg("");
-        setFirstHover(false);
-        setSecondTokenId("");
-        setSecondTokenImg("");
-        setSecondHover(false);
-        setBreedingNftTokenId("");
-        setBreedingNftImg("");
+        setFirstToken({id:'',img:'',character:''});
+        setSecondToken({id:'',img:'',character:''});
     }
     // 첫번째 선택 초기화
-    function initFirstToken(){
-        setFirstTokenId("");
-        setFirstTokenImg("");
-        setFirstHover(false);
+    function initFirstToken() {
+        setFirstToken({id:'',img:'',character:''});
     }
     // 두번째 선택 초기화
-    function initSecondToken(){
-        setSecondTokenId("");
-        setSecondTokenImg("");
-        setSecondHover(false);
+    function initSecondToken() {
+        setSecondToken({id:'',img:'',character:''});
     }
-    async function timeSearch() {
-        if (!searchTokenIdCheck()) {
-            return false;
-        }
-    }
-    async function nftBreeding() {
-        if (!breedTokenIdCheck()) {
-            return false;
-        }
-        // todo : api 호출전 히스토리 요청
-        let breedingResult;
-        let alertMsg = `Token ID ${firstTokenId} + ${secondTokenId} breed Success`; // 에러메세지
-        let breedingStatus = false; // 리빌 상태
-        try {
-            const gasLimit = await breedingContract.methods.revealToken(firstTokenId, secondTokenId).estimateGas({
-                from: props.accounts[0],
-            })
-            const gasPrice = await caver.rpc.klay.getGasPrice();
-            breedingResult = await breedingContract.methods.revealToken(firstTokenId, secondTokenId).send({
-                from: props.accounts[0],
-                gas: gasLimit,
-                gasPrice,
-            });
-            console.log(breedingResult); // 리빌 결과값
-            breedingStatus = true;
-        } catch (e) {
-            console.log(e);
-            setAlerts("breeding Fail ");
-        }
-        // todo : api 호출후 히스토리 요청
-        // 브리딩이 성공하였을때
-        if (breedingStatus) {
-            try {
-                const mintResult = await POST(`/api/v1/larvaBreeding/save`, {
-                    tokenId,
-                    txHash: breedingResult.transactionHash
-                }, props.apiToken);
-                console.log(mintResult)
-                if (mintResult.result === 'error') {
-                    throw new Error(mintResult.error);
-                }
-                setBreedingNftTokenId(""); // todo : 완료 토큰 및 이미지
-                setBreedingNftImg("");
-                breedIntroPlay();
-            } catch (e) {
-                console.log(e);
-            }
-            setAlerts(`${alertMsg}`);
-        }
-        setShowAlertModal(true);
-        setTokenId("");
-        setShowBreedingModal(false);
-        return true;
-    }
-
     function myNftListOpen(sequence) {
         console.log(props.accounts);
-        if(props.accounts[0]){
+        if (props.accounts[0]) {
             setSelectBox(true);
             setSelectSequence(sequence);
         } else {
@@ -184,11 +213,10 @@ function LarvaNFTBreeding(props) {
     }
 
 
-
     useEffect(() => {
         // 애니메이션 활성
         AOS.init({
-            duration : 1000
+            duration: 1000
         });
     }, []);
 
@@ -201,13 +229,16 @@ function LarvaNFTBreeding(props) {
                     Home
                 </Link>
                 <img data-aos="fade-up" data-aos-duration="1000"
-                     data-aos-anchor-placement="top-bottom" className={`${styles.characterImg01} ${styles.characterImg}`} src={VisualCharacter01}
+                     data-aos-anchor-placement="top-bottom"
+                     className={`${styles.characterImg01} ${styles.characterImg}`} src={VisualCharacter01}
                      alt="VisualCharacter01"/>
                 <img data-aos="fade-up" data-aos-duration="1000"
-                     data-aos-anchor-placement="top-bottom" className={`${styles.characterImg02} ${styles.characterImg}`} src={VisualCharacter02}
+                     data-aos-anchor-placement="top-bottom"
+                     className={`${styles.characterImg02} ${styles.characterImg}`} src={VisualCharacter02}
                      alt="VisualCharacter02"/>
                 <img data-aos="fade-up" data-aos-duration="1000"
-                     data-aos-anchor-placement="top-bottom" className={`${styles.characterImg03} ${styles.characterImg}`} src={VisualCharacter03}
+                     data-aos-anchor-placement="top-bottom"
+                     className={`${styles.characterImg03} ${styles.characterImg}`} src={VisualCharacter03}
                      alt="VisualCharacter03"/>
             </section>
             <section className={styles.breeding_nft}>
@@ -223,15 +254,15 @@ function LarvaNFTBreeding(props) {
                         </p>
                     </div>
                     <div className={styles.select_view_box}>
-                        {(firstTokenImg) ? (
+                        {(firstToken.img) ? (
                             <div className={styles.nft_box} onClick={() => {
                                 initFirstToken()
                             }} onMouseEnter={() => setFirstHover(true)} onMouseLeave={() => setFirstHover(false)}>
-                                <img className={styles.nft_img} src={firstTokenImg} alt={firstTokenId}/>
-                                <span>#{firstTokenId} Larva</span>
+                                <img className={styles.nft_img} src={firstToken.img} alt={firstToken.id}/>
+                                <span>#{firstToken.id} Larva</span>
                                 <div className={`${styles.hover_box} ${firstHover && styles.show_display}`}>
-                                        <img src={BreedingXIcon} alt="icon"/>
-                                        <p>클릭 시 NFT 선택이 해제됩니다.</p>
+                                    <img src={BreedingXIcon} alt="icon"/>
+                                    <p>클릭 시 NFT 선택이 해제됩니다.</p>
                                 </div>
                             </div>
                         ) : (
@@ -245,38 +276,40 @@ function LarvaNFTBreeding(props) {
                             </div>
                         )}
                         <div className={styles.status_box}>
-                            {(firstTokenId)?(
-                                (firstTokenId && secondTokenId) ? (
-                                    <img src={BreedingOnLine2} alt="status ready" />
+                            {(firstToken.id) ? (
+                                (firstToken.id && secondToken.id) ? (
+                                    <img src={BreedingOnLine2} alt="status ready"/>
                                 ) : (
-                                    <img src={BreedingOnLine} alt="status on" />
+                                    <img src={BreedingOnLine} alt="status on"/>
                                 )
-                            ):(
-                                <img src={BreedingOffLine} alt="status off" />
+                            ) : (
+                                <img src={BreedingOffLine} alt="status off"/>
                             )}
-                        {firstTokenId && secondTokenId ? (
-                            <button onClick={() => setShowBreedingModal(true)}
-                                    className={styles.breeding_btn}><img src={BreedingOnButton} alt="breeding button"/></button>
-                        ) : (
-                            <button onClick={() => alert("NFT를 선택해주세요.")}
-                                    className={styles.breeding_btn}><img src={BreedingOffButton} alt="breeding button"/></button>
-                        )}
-                            {(secondTokenId)?(
-                                (firstTokenId && secondTokenId) ? (
-                                    <img src={BreedingOnLine2} alt="status ready" />
+                            {firstToken.id && secondToken.id ? (
+                                <button onClick={() => setShowBreedingModal(true)}
+                                        className={styles.breeding_btn}><img src={BreedingOnButton}
+                                                                             alt="breeding button"/></button>
+                            ) : (
+                                <button onClick={() => alert("NFT를 선택해주세요.")}
+                                        className={styles.breeding_btn}><img src={BreedingOffButton}
+                                                                             alt="breeding button"/></button>
+                            )}
+                            {(secondToken.id) ? (
+                                (firstToken.id && secondToken.id) ? (
+                                    <img src={BreedingOnLine2} alt="status ready"/>
                                 ) : (
-                                    <img src={BreedingOnLine} alt="status on" />
+                                    <img src={BreedingOnLine} alt="status on"/>
                                 )
-                            ):(
-                                <img src={BreedingOffLine} alt="status off" />
+                            ) : (
+                                <img src={BreedingOffLine} alt="status off"/>
                             )}
                         </div>
-                        {(secondTokenImg) ? (
+                        {(secondToken.img) ? (
                             <div className={styles.nft_box} onClick={() => {
                                 initSecondToken()
                             }} onMouseEnter={() => setSecondHover(true)} onMouseLeave={() => setSecondHover(false)}>
-                                <img className={styles.nft_img} src={secondTokenImg} alt={secondTokenId}/>
-                                <span>#{secondTokenId} Larva</span>
+                                <img className={styles.nft_img} src={secondToken.img} alt={secondToken.id}/>
+                                <span>#{secondToken.id} Larva</span>
                                 <div className={`${styles.hover_box} ${secondHover && styles.show_display}`}>
                                     <img src={BreedingXIcon} alt="icon"/>
                                     <p>클릭 시 NFT 선택이 해제됩니다.</p>
@@ -293,20 +326,24 @@ function LarvaNFTBreeding(props) {
                             </div>
                         )}
                     </div>
-
-
                 </div>
             </section>
-            <section  className={styles.breeding_nft}>
+            <section className={styles.breeding_nft}>
                 <div className={styles.content_box}>
                     <h3 className={styles.content_title}>Check Breeding Possibilities</h3>
                     <div>
                         <label className={styles.input_box}>
                             <span>Token ID</span>
-                            <input ref={tokenIdInput} type="text" name="tokenId" value={tokenId} maxLength="4"
+                            <input ref={searchTokenIdInput} type="text" name="tokenId" value={searchTokenIdInput} maxLength="4"
                                    onChange={numberCheck} placeholder={"Please enter Token ID"}/>
-                            <button><img src={SearchButton} alt="search button"/></button>
+                            <button onClick={() => {
+                                tokenIdTimeCheck()
+                            }}><img src={SearchButton} alt="search button"/></button>
                         </label>
+                        <div className={styles.time_box}>
+                            {'사용 불가능'}<br/>
+                            {'남은 시간 : 00:00:00'}
+                        </div>
                     </div>
                 </div>
             </section>
@@ -319,14 +356,14 @@ function LarvaNFTBreeding(props) {
             </div>
             {/*알림창 모달*/}
             <Modal centered show={showAlertModal}
-                   onHide={() => setShowAlertModal(false)}>
+                   onHide={() => closeAlert()}>
                 <Modal.Body>
                     <div className="text-center mt-5">
                         <p className={styles.alert_msg}> {alerts}</p>
                     </div>
                 </Modal.Body>
                 <Modal.Footer className={styles.alert_box}>
-                    <button variant="" onClick={() => setShowAlertModal(false)} className={styles.alert_btn}>
+                    <button variant="" onClick={() => closeAlert()} className={styles.alert_btn}>
                         Close
                     </button>
                 </Modal.Footer>
@@ -334,34 +371,33 @@ function LarvaNFTBreeding(props) {
             {/*브리딩확인 모달*/}
             <Modal centered size="xs" show={showBreedingModal}
                    onHide={() => setShowBreedingModal(false)} className={styles.breeding_modal}>
-                    <div className={styles.breeding_confirm}>
-                        <h3>Breed</h3>
-                        <p className={styles.alert_msg}>
-                            {firstTokenId} + {secondTokenId}<br/>
-                            Do you want to proceed<br/>
-                            with Breeding?
-                            {/*<span className={styles.alert_msg_span}>※ 뭐나올지 모름~</span>*/}
-                        </p>
-                        {/*<button onClick={() => nftBreeding()} className={`${styles.alert_btn} ${styles.point_color}`}>*/}
-
-                        <button onClick={() => setShowBreedingModal(false)} className={styles.alert_btn}>
-                            Cancel
-                        </button>
-                        <button onClick={() => nftBreeding()} className={`${styles.alert_btn} ${styles.point_color}`}>
-                            OK
-                        </button>
-                    </div>
+                <div className={styles.breeding_confirm}>
+                    <h3>Breed</h3>
+                    <p className={styles.alert_msg}>
+                        {firstToken.id} + {secondToken.id}<br/>
+                        Do you want to proceed<br/>
+                        with Breeding?
+                        {/*<span className={styles.alert_msg_span}>※ 뭐나올지 모름~</span>*/}
+                    </p>
+                    <button onClick={() => setShowBreedingModal(false)} className={styles.alert_btn}>
+                        Cancel
+                    </button>
+                    <button onClick={() => nftBreeding()} className={`${styles.alert_btn} ${styles.point_color}`}>
+                        OK
+                    </button>
+                </div>
             </Modal>
             {/*브리딩완료 모달*/}
             <Modal centered size="xs" show={showBreedingResultModal}
-                   onHide={() => setShowBreedingResultModal(false)} className={styles.breeding_result_modal}>
+                   onHide={() => closeBreedingResultModal()} className={styles.breeding_result_modal}>
                 <div className={styles.breeding_confirm}>
                     <div className={styles.nft_box}>
                         <img className={styles.nft_img} src={breedingNftImg} alt="breeding NFT"/>
                         <span>#{breedingNftTokenId} Larva</span>
                     </div>
 
-                    <button onClick={() => setShowBreedingResultModal(false)} className={`${styles.alert_btn} ${styles.point_color}`}>
+                    <button onClick={() => closeBreedingResultModal()}
+                            className={`${styles.alert_btn} ${styles.point_color}`}>
                         OK
                     </button>
                 </div>
@@ -371,10 +407,8 @@ function LarvaNFTBreeding(props) {
 
             {selectBox ? (
                 <SelectNftBoxModal selectBox={selectBox} setSelectBox={setSelectBox} nftContract={nftContract}
-                                   userAddress={props.accounts[0]} setFirstTokenId={setFirstTokenId}
-                                   firstTokenId={firstTokenId} setFirstTokenImg={setFirstTokenImg}
-                                   secondTokenId={secondTokenId} setSecondTokenId={setSecondTokenId}
-                                   setSecondTokenImg={setSecondTokenImg}
+                                   userAddress={props.accounts[0]} setFirstToken={setFirstToken}
+                                   firstToken={firstToken} secondToken={secondToken} setSecondToken={setSecondToken}
                                    selectSequence={selectSequence}
                                    setShowLoading={setShowLoading}/>) : (<></>)
             }

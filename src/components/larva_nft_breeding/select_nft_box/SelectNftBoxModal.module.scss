@@ -79,12 +79,15 @@
         font-weight: 700;
         padding: 20px 0;
       }
+      .hide{
+        display: none;
+      }
     }
     .selected_box{
       position: relative;
-      cursor: none!important;
+      cursor: not-allowed!important;
       img{
-      filter: grayscale(80%);
+        filter: grayscale(80%);
         opacity: 0.2;
       }
       >span{
@@ -94,13 +97,14 @@
         position: absolute;
         top: 10%;
         left: 0;
-        color: #FFF;
-        background-color: red;
+        color: #000;
+        background-color: #f5af00;
       }
     }
     .active{
       background-color: #f5af00;
     }
+
   }
 }
 
