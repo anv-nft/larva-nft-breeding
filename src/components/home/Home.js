@@ -85,8 +85,6 @@ export default function Home(props) {
                                 <br/>
                                 {props.t("story_04").split("\n").map((line,index) => (<span key={index}>{line}</span>))}
                                 <br/>
-                                {props.t("story_05").split("\n").map((line,index) => (<span key={index}>{line}</span>))}
-                                <br/>
                             </p>
                         </div>
                     </div>
@@ -197,16 +195,6 @@ export default function Home(props) {
                             <div className={`${styles.a} ${faqStatus === 5 ? styles.faq_a_active : ""}`}>
                                 <div>
                                     {props.t("faq_a_05")}
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div className={`${styles.q} ${faqStatus === 6 ? styles.faq_q_active : ""}`} onClick={() => faqToggle(6)}>
-                                <p>{props.t("faq_q_06")}</p>
-                            </div>
-                            <div className={`${styles.a} ${faqStatus === 6 ? styles.faq_a_active : ""}`}>
-                                <div >
-                                    {props.t("faq_a_06")}
                                 </div>
                             </div>
                         </li>
