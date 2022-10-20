@@ -36,21 +36,20 @@ function LarvaNFTBreeding(props) {
     const [showAlertModal, setShowAlertModal] = useState(false); // 알림창 모달
     const [showBreedingModal, setShowBreedingModal] = useState(false); // 브리딩 확인 모달
     const [showBreedingResultModal, setShowBreedingResultModal] = useState(false); // 브리딩 완료 모달
-    const [alerts, setAlerts] = useState("");
-    const AGREE_YN = localStorage.getItem('agreeYN');
-    const [showPopupModal, setShowPopupModal] = useState(false);
+    const [alerts, setAlerts] = useState(""); // 알림 메세지
 
-    const [firstTokenId, setFirstTokenId] = useState("");
-    const [firstTokenImg, setFirstTokenImg] = useState("");
-    const [firstHover, setFirstHover] = useState(false);
-    const [secondTokenId, setSecondTokenId] = useState("");
-    const [secondTokenImg, setSecondTokenImg] = useState("");
-    const [secondHover, setSecondHover] = useState(false);
-    const [breedingNftTokenId, setBreedingNftTokenId] = useState("");
-    const [breedingNftImg, setBreedingNftImg] = useState("");
+    const [firstTokenId, setFirstTokenId] = useState(""); // 1번 선택된 토큰 ID
+    const [firstTokenImg, setFirstTokenImg] = useState(""); // 1번 선택된 토큰 ID 이미지 URL
+    const [firstHover, setFirstHover] = useState(false); // 1번 선택된 박스 마우스 hover 상태
+    const [secondTokenId, setSecondTokenId] = useState(""); // 2번 선택된 토큰 ID
+    const [secondTokenImg, setSecondTokenImg] = useState("") ;// 2번 선택된 토큰 ID 이미지 URL
+    const [secondHover, setSecondHover] = useState(false); // 2번 선택된 박스 마우스 hover 상태
+    const [breedingNftTokenId, setBreedingNftTokenId] = useState(""); // 브리딩 성공한 NFT 토큰 ID
+    const [breedingNftImg, setBreedingNftImg] = useState(""); // 브리딩 성공한 NFT 토큰 ID 이미지 URL
 
-    const tokenIdInput = useRef();
-    const [tokenId, setTokenId] = useState("");
+    const tokenIdInput = useRef(); // 타임 검색용 토큰 ID
+    const [tokenId, setTokenId] = useState(""); // 타임 검색용 토큰 ID
+    // 숫자인지 체크
     const numberCheck = (e) => {
         const regex = /^[0-9\b -]{0,13}$/;
         if (regex.test(e.target.value)) {
@@ -184,33 +183,20 @@ function LarvaNFTBreeding(props) {
 
     }
 
-    function agreePopup() {
-        // 로컬스토리지 저장
-        // localStorage.setItem('agreeYN', 'Y');
-        setShowPopupModal(false);
-    }
+
 
     useEffect(() => {
-        // localStorage.removeItem('agreeYN');
-        // 팝업 오늘 하루닫기 체크
-        // if (AGREE_YN === null) {
-        //     setShowPopupModal(true);
-        // } else{
-        //     setShowPopupModal(false);
-        // }
+        // 애니메이션 활성
         AOS.init({
             duration : 1000
         });
     }, []);
 
-    useEffect(() => {
-        // todo : 선택한 NFT 그리기
-    }, [firstTokenId, secondTokenId]);
     return (
         <>
             <section className={styles.visual_section}>
                 <img className={styles.background_img} src={VisualBackground} alt="Visual Background"/>
-                <img src={VisualLogo} alt="VisualLogo"/><br/>
+                <img className={styles.visual_logo} src={VisualLogo} alt="VisualLogo"/><br/>
                 <Link data-aos="zoom-out" to="/" className={styles.hrefButton}>
                     Home
                 </Link>
@@ -331,31 +317,6 @@ function LarvaNFTBreeding(props) {
                     지원하지 않는 브라우저입니다.
                 </video>
             </div>
-            {/*팝업 모달*/}
-            <Modal centered size="lg" show={showPopupModal}
-                   onHide={() => setShowPopupModal(false)} backdrop="static"
-                   keyboard={false} dialogClassName="modal-90w">
-                <Modal.Header>
-                    <Container>
-                        <Row>
-                            <Col xs={9} md={6}>
-                                <Modal.Title>[동의 및 확인]</Modal.Title>
-                            </Col>
-                            <Col xs={9} md={6}>
-                                <Modal.Title>[Agree and Confirm]</Modal.Title>
-                            </Col>
-                        </Row>
-                    </Container>
-                </Modal.Header>
-                <Modal.Body>
-
-                </Modal.Body>
-                <Modal.Footer className={styles.alert_box}>
-                    <button variant="" onClick={() => agreePopup()} className={styles.popup_btn}>
-                        AGREE
-                    </button>
-                </Modal.Footer>
-            </Modal>
             {/*알림창 모달*/}
             <Modal centered show={showAlertModal}
                    onHide={() => setShowAlertModal(false)}>
