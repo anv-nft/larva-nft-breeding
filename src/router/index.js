@@ -46,7 +46,7 @@ function Index() {
         }
         if (didMount.current) {
             didMount.current = false;
-            // return;
+            return;
         }
         if (!active) {
             logoutEffect();
