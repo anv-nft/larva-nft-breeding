@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {Modal} from 'react-bootstrap';
 import {POST} from "../../../api/api";
-import Web3 from "web3";
+import Caver from "caver-js";
 import styles from "./SelectNftBoxModal.module.scss"
 import iconX from "../../../assets/images/icon/icon_x_s.png";
 import {contracts} from "../../../utils/web3/contracts";
@@ -13,10 +13,10 @@ function SelectNftBoxModal(props) {
     const [selectedNft, setSelectedNft] = useState("");
 
     const provider = window['klaytn'];
-    const web3 = new Web3(provider);
+    const caver = new Caver(provider);
     const BREEDING_CONTRACT_ADDRESS = contracts['breeding_contract'][props.networkId];
     const PFP_3D_NFT_CONTRACT_ADDRESS = contracts['pfp_3d_nft_contract'][props.networkId];
-    const breedingContract = new web3.eth.Contract(BREEDING_ABI, BREEDING_CONTRACT_ADDRESS);
+    const breedingContract = new caver.klay.Contract(BREEDING_ABI, BREEDING_CONTRACT_ADDRESS);
 
     function selectNft(e) {
         const box = e.currentTarget;
@@ -53,28 +53,37 @@ function SelectNftBoxModal(props) {
             const address = props.userAddress;
             await POST(`/api/v1/breeding/getNft`, {
                 address,
-            }, token).then((result) => {
+            }, token).then(async (result) => {
                 console.log(result);
                 if (result.result === 'success') {
-                    result.data.forEach(async (key, value) => {
-                        if (props.firstToken.character === key.character || props.secondToken.character === key.character) {
-                            result.data[value].status = 'same character';
+                    const nftList = result.data;
+                    for (let index = 0; index < nftList.length; index++) {
+                        // Get num of each fruit
+                        console.log(nftList[index]);
+                        if (props.firstToken.character === nftList[index].character || props.secondToken.character === nftList[index].character) {
+                            nftList[index].status = 'same character';
                         }
-                        if ('0x' + parseInt(props.firstToken.id).toString(16) === key.tokenId) {
-                            result.data[value].status = 'selected';
+                        if ('0x' + parseInt(props.firstToken.id).toString(16) === nftList[index].tokenId) {
+                            nftList[index].status = 'selected';
                         }
-                        if ('0x' + parseInt(props.secondToken.id).toString(16) === key.tokenId) {
-                            result.data[value].status = 'selected';
+                        if ('0x' + parseInt(props.secondToken.id).toString(16) === nftList[index].tokenId) {
+                            nftList[index].status = 'selected';
                         }
-                        if(key.character == 'Pink' || key.character == 'Brown'){
-                            const coolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, key.tokenId).call().then(e => {
-                                return e;
-                            })
-                            if(coolTime > 0){
-                                result.data[value].cooltime = secondToTime(coolTime);
+                        if(nftList[index].character == 'Pink' || nftList[index].character == 'Brown'){
+                            try{
+                                const coolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, nftList[index].tokenId).call().then(e => {
+                                    return e;
+                                })
+                                if(coolTime){
+                                    if(parseInt(coolTime[0]) > 0){
+                                        nftList[index].cooltime = secondToTime(coolTime[0]);
+                                    }
+                                }
+                            }catch (e){
                             }
                         }
-                    })
+                    }
+                    console.log(result.data);
                     setListItem(result.data);
                     setSelectModal(true);
                 } else {
@@ -119,7 +128,7 @@ function SelectNftBoxModal(props) {
                                     <span className={styles.hide}>{nft.character}</span>
                                     {
                                         (nft.cooltime) &&
-                                        <span className={styles.coolTime}>COOLTIME : 00:00:00</span>
+                                        <span className={styles.coolTime}>COOLTIME : {nft.cooltime}</span>
                                     }
                                     <div className={styles.selected_dim}>{nft.status}</div>
                                 </div>
@@ -132,7 +141,7 @@ function SelectNftBoxModal(props) {
                                     <span className={styles.hide}>{nft.character}</span>
                                     {
                                         (nft.cooltime) &&
-                                        <span className={styles.coolTime}>COOLTIME : 00:00:00</span>
+                                        <span className={styles.coolTime}>COOLTIME : {nft.cooltime}</span>
                                     }
                                 </div>
                             )
