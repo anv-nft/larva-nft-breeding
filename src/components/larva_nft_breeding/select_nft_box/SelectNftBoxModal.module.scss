@@ -79,6 +79,11 @@
         font-weight: 700;
         padding: 20px 0;
       }
+      .coolTime{
+        font-size: 14px;
+        padding: 0;
+        color: red;
+      }
       .hide{
         display: none;
       }
@@ -86,20 +91,24 @@
     .selected_box{
       position: relative;
       cursor: not-allowed!important;
-      img{
-        filter: grayscale(80%);
-        opacity: 0.2;
-      }
-      >span{
-        display: inline-block;
-        width: 100%;
-        text-align: center;
-        position: absolute;
-        top: 10%;
-        left: 0;
-        color: #000;
-        background-color: #f5af00;
-      }
+
+    }
+    .selected_dim {
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: #FFF;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 18px;
+      font-family: Poppins;
+      font-size: 50px;
+      font-weight: 700;
+      padding-top: 50px;
+      -webkit-text-stroke: 2px #f5af00;
     }
     .active{
       background-color: #f5af00;

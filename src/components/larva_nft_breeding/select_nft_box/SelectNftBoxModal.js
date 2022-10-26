@@ -1,13 +1,22 @@
 import React, {useEffect, useState} from 'react'
 import {Modal} from 'react-bootstrap';
 import {POST} from "../../../api/api";
+import Web3 from "web3";
 import styles from "./SelectNftBoxModal.module.scss"
 import iconX from "../../../assets/images/icon/icon_x_s.png";
-
+import {contracts} from "../../../utils/web3/contracts";
+import {BREEDING_ABI} from "../../../utils/abi/BREEDING_ABI";
+import {secondToTime} from "../../../utils/anvUtils";
 function SelectNftBoxModal(props) {
     const [selectModal, setSelectModal] = useState(false);
     const [listItem, setListItem] = useState([]);
     const [selectedNft, setSelectedNft] = useState("");
+
+    const provider = window['klaytn'];
+    const web3 = new Web3(provider);
+    const BREEDING_CONTRACT_ADDRESS = contracts['breeding_contract'][props.networkId];
+    const PFP_3D_NFT_CONTRACT_ADDRESS = contracts['pfp_3d_nft_contract'][props.networkId];
+    const breedingContract = new web3.eth.Contract(BREEDING_ABI, BREEDING_CONTRACT_ADDRESS);
 
     function selectNft(e) {
         const box = e.currentTarget;
@@ -47,7 +56,7 @@ function SelectNftBoxModal(props) {
             }, token).then((result) => {
                 console.log(result);
                 if (result.result === 'success') {
-                    result.data.forEach((key, value) => {
+                    result.data.forEach(async (key, value) => {
                         if (props.firstToken.character === key.character || props.secondToken.character === key.character) {
                             result.data[value].status = 'same character';
                         }
@@ -56,6 +65,14 @@ function SelectNftBoxModal(props) {
                         }
                         if ('0x' + parseInt(props.secondToken.id).toString(16) === key.tokenId) {
                             result.data[value].status = 'selected';
+                        }
+                        if(key.character == 'Pink' || key.character == 'Brown'){
+                            const coolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, key.tokenId).call().then(e => {
+                                return e;
+                            })
+                            if(coolTime > 0){
+                                result.data[value].cooltime = secondToTime(coolTime);
+                            }
                         }
                     })
                     setListItem(result.data);
@@ -100,7 +117,11 @@ function SelectNftBoxModal(props) {
                                     <img className={styles.nft_img} src={nft.image} alt={nft.tokenId}/>
                                     <span>#<span>{parseInt(nft.tokenId, 16)}</span> Larva</span>
                                     <span className={styles.hide}>{nft.character}</span>
-                                    <span>{nft.status}</span>
+                                    {
+                                        (nft.cooltime) &&
+                                        <span className={styles.coolTime}>COOLTIME : 00:00:00</span>
+                                    }
+                                    <div className={styles.selected_dim}>{nft.status}</div>
                                 </div>
                             ) : (
                                 <div key={nft.tokenId} className={styles.nft_box} onClick={(event) => {
@@ -109,6 +130,10 @@ function SelectNftBoxModal(props) {
                                     <img className={styles.nft_img} src={nft.image} alt={nft.tokenId}/>
                                     <span>#<span>{parseInt(nft.tokenId, 16)}</span> Larva</span>
                                     <span className={styles.hide}>{nft.character}</span>
+                                    {
+                                        (nft.cooltime) &&
+                                        <span className={styles.coolTime}>COOLTIME : 00:00:00</span>
+                                    }
                                 </div>
                             )
                         ))
