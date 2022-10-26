@@ -1,9 +1,3 @@
-body {
-  //background-color: #5c00b6 !important;
-}
-
-
-
 .visual_section {
   position: relative;
   padding-top: 365px;
@@ -180,6 +174,7 @@ body {
       font-size: 50px;
       font-weight: 700;
       font-family: 'Poppins';
+      color: #FFF;
     }
   }
 }
@@ -303,6 +298,9 @@ body {
       font-size: 54px;
       color: #FFF;
     }
+    p{
+      color: #FFF;
+    }
     button:nth-last-child(1){
       margin-left: 30px;
     }
@@ -361,6 +359,7 @@ body {
     border-radius: 18px;
     border: 5px solid rgba(255,255,255,1);
     background-color: rgba(0,0,0,0.5);
+    color: #FFF;
     display: none;
   }
 }
