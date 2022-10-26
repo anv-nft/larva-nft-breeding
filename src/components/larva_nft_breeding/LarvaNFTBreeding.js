@@ -42,7 +42,7 @@ function LarvaNFTBreeding(props) {
     }
     function closeBreedingResultModal() {
         setShowBreedingResultModal(false);
-        setBreedingNftTokenId("");
+        setBreedingNftName("");
         setBreedingNftImg("");
     }
 
@@ -50,7 +50,7 @@ function LarvaNFTBreeding(props) {
     const [firstHover, setFirstHover] = useState(false); // 1번 선택된 박스 마우스 hover 상태
     const [secondToken, setSecondToken] = useState({id:'',img:'',character:''}); // 2번 선택된 토큰 ID
     const [secondHover, setSecondHover] = useState(false); // 2번 선택된 박스 마우스 hover 상태
-    const [breedingNftTokenId, setBreedingNftTokenId] = useState(""); // 브리딩 성공한 NFT 토큰 ID
+    const [breedingNftName, setBreedingNftName] = useState(""); // 브리딩 성공한 NFT 토큰 ID
     const [breedingNftImg, setBreedingNftImg] = useState(""); // 브리딩 성공한 NFT 토큰 ID 이미지 URL
 
     const provider = window['klaytn'];
@@ -71,14 +71,26 @@ function LarvaNFTBreeding(props) {
 
     const searchTokenIdInput = useRef(); // 타임 검색용 토큰 ID
     const [searchTokenId, setSearchTokenId] = useState(""); // 타임 검색용 토큰 ID
+    const [coolTime, setCoolTime] = useState(null); // 남은시간
     // 숫자인지 체크
     const numberCheck = (e) => {
         const regex = /^[0-9\b -]{0,13}$/;
         if (regex.test(e.target.value)) {
             setSearchTokenId(e.target.value);
+            setCoolTime(null);
         }
     }
-
+    // 지갑연결 확인
+    function walletCheck(){
+        console.log(props.accounts[0]);
+        if (props.accounts[0] === undefined) {
+            setAlerts("Please connect wallet.");
+            setShowAlertModal(true);
+            return false;
+        }
+        return true;
+    }
+    // 쿨타임 토큰아이디 체크
     function searchTokenIdCheck() {
         if (searchTokenIdInput.current.value === "") {
             setAlerts("Please enter your token ID.");
@@ -89,16 +101,30 @@ function LarvaNFTBreeding(props) {
         return true;
     }
 
+    function secondToTime(seconds) {
+        let hour = parseInt(seconds/3600);
+        let min = parseInt((seconds%3600)/60);
+        let sec = seconds%60;
+        if (hour.toString().length==1) hour = "0" + hour;
+        if (min.toString().length==1) min = "0" + min;
+        if (sec.toString().length==1) sec = "0" + sec;
+        return hour + ":" + min + ":" + sec;
+    }
     async function tokenIdTimeCheck() {
+        if (!walletCheck()) {
+            return false;
+        }
         if (!searchTokenIdCheck()) {
             return false;
         }
         try {
             const coolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, searchTokenId).call().then(e => {
                 return e;
-            });
-            console.log(coolTime);
+            })
+            console.log(coolTime[0]);
+            setCoolTime(coolTime[0]);
         } catch (e) {
+            console.log(e);
             setAlerts("Please check the tokenID");
             setShowAlertModal(true);
             return false
@@ -112,10 +138,12 @@ function LarvaNFTBreeding(props) {
         }
         let breedingIdx;
         let breedingResult;
+        let breedingError
+        let breedingHash = null;
         let alertMsg = `Token ID ${firstToken.id} + ${secondToken.id} breed Success`; // 에러메세지
         try {
             // api 호출전 히스토리 요청
-            const breedingBeforeResult = await POST(`/api/v1/larvaBreeding/log_before`, {
+            const breedingBeforeResult = await POST(`/api/v1/breeding/log_before`, {
                 firstTokenId: firstToken.id,
                 secondTokenId: secondToken.id,
                 address: props.accounts[0],
@@ -128,37 +156,117 @@ function LarvaNFTBreeding(props) {
             if(breedingIdx){
                 // 브리딩 실행
                 try {
-                    const gasLimit = await breedingContract.methods.breed(firstToken.id, secondToken.id).estimateGas({
-                        from: props.accounts[0],
-                    })
+                    // const gasLimit = await breedingContract.methods.breeding(props.accounts[0],firstToken.id, secondToken.id).estimateGas({
+                    //     from: props.accounts[0],
+                    // })
+                    const gasLimit = 1000000
                     const gasPrice = await caver.rpc.klay.getGasPrice();
-                    breedingResult = await breedingContract.methods.breed(firstToken.id, secondToken.id).send({
+                    breedingResult = await breedingContract.methods.breeding(PFP_3D_NFT_CONTRACT_ADDRESS,firstToken.id, secondToken.id).send({
                         from: props.accounts[0],
                         gas: gasLimit,
                         gasPrice,
                     });
                     console.log(breedingResult); // 브리딩 결과값
-                    setBreedingNftTokenId(""); // todo : 완료 토큰 및 이미지
-                    setBreedingNftImg("");
+                    // {
+                    //     "blockHash": "0x40542f0a004616c3dd2dd91224773a6bf6620a7e729156942a2d897f2796e8b3",
+                    //     "blockNumber": 105102194,
+                    //     "contractAddress": null,
+                    //     "effectiveGasPrice": "0x5d21dba00",
+                    //     "from": "0x05c462b4014e148ed4524a1eb3bb8cab75ec0735",
+                    //     "gas": "0xf4240",
+                    //     "gasPrice": "0xba43b7400",
+                    //     "gasUsed": 254565,
+                    //     "input": "0x14d849b80000000000000000000000007957753231959287b22685a4d7f40d262c556b6f00000000000000000000000000000000000000000000000000000000000003e80000000000000000000000000000000000000000000000000000000000000d05",
+                    //     "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000810000040000000020000000000000000008000000001000000008000000000000000000000000000000000000000000000000020000000000000000000800000000000000040000000090000000000008000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000002000000000000000000000008000000000000000000000000000020000000000000000000000000000000000000000000000000001000000400000000",
+                    //     "nonce": "0x9e",
+                    //     "senderTxHash": "0x4c02c5f07affea9f8c8da664b2e58ed63b9e6ef539b0470371b15a905beea4f8",
+                    //     "signatures": [
+                    //     {
+                    //         "V": "0x7f5",
+                    //         "R": "0x55522373020960ac30f9e865d651793d372ee8a89f6f0cb09a76a508206955da",
+                    //         "S": "0x508232b58de60969b8a84ee72c65f45890320d9a4411327595612a8b44475369"
+                    //     }
+                    // ],
+                    //     "status": true,
+                    //     "to": "0x066ccfa3f04220724481628a3032bd6ae53b1387",
+                    //     "transactionHash": "0x4c02c5f07affea9f8c8da664b2e58ed63b9e6ef539b0470371b15a905beea4f8",
+                    //     "transactionIndex": 0,
+                    //     "type": "TxTypeLegacyTransaction",
+                    //     "typeInt": 0,
+                    //     "value": "0x0",
+                    //     "events": {
+                    //     "0": {
+                    //         "address": "0xdf95b2aBD60EA66A530485a460eC199E0455208a",
+                    //             "blockNumber": 105102194,
+                    //             "transactionHash": "0x4c02c5f07affea9f8c8da664b2e58ed63b9e6ef539b0470371b15a905beea4f8",
+                    //             "transactionIndex": 0,
+                    //             "blockHash": "0x40542f0a004616c3dd2dd91224773a6bf6620a7e729156942a2d897f2796e8b3",
+                    //             "logIndex": 0,
+                    //             "id": "log_8cd49628",
+                    //             "returnValues": {},
+                    //         "signature": null,
+                    //             "raw": {
+                    //             "data": "0x",
+                    //                 "topics": [
+                    //                 "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                    //                 "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    //                 "0x00000000000000000000000005c462b4014e148ed4524a1eb3bb8cab75ec0735",
+                    //                 "0x000000000000000000000000000000000000000000000000000000000000000a"
+                    //             ]
+                    //         }
+                    //     },
+                    //     "Breeded": {
+                    //         "address": "0x066CcfA3f04220724481628A3032bd6aE53b1387",
+                    //             "blockNumber": 105102194,
+                    //             "transactionHash": "0x4c02c5f07affea9f8c8da664b2e58ed63b9e6ef539b0470371b15a905beea4f8",
+                    //             "transactionIndex": 0,
+                    //             "blockHash": "0x40542f0a004616c3dd2dd91224773a6bf6620a7e729156942a2d897f2796e8b3",
+                    //             "logIndex": 1,
+                    //             "id": "log_8758d726",
+                    //             "returnValues": {
+                    //             "0": "0x05c462B4014E148eD4524a1eB3bb8cAB75eC0735",
+                    //                 "1": "10",
+                    //                 "2": "1",
+                    //                 "tokenOwner": "0x05c462B4014E148eD4524a1eB3bb8cAB75eC0735",
+                    //                 "tokenId": "10",
+                    //                 "_breedingType": "1"
+                    //         },
+                    //         "event": "Breeded",
+                    //             "signature": "0x466e7676a69a4f354fee5532512019a096d1b19c5e5770d92ab2bd904e92e6f0",
+                    //             "raw": {
+                    //             "data": "0x00000000000000000000000005c462b4014e148ed4524a1eb3bb8cab75ec0735000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000001",
+                    //                 "topics": [
+                    //                 "0x466e7676a69a4f354fee5532512019a096d1b19c5e5770d92ab2bd904e92e6f0"
+                    //             ]
+                    //         }
+                    //     }
+                    // }
+                    // }
+                    // const kidsJson = await fetch(`https://metadata-store.klaytnapi.com/1f5d655e-3529-df24-5f0a-65824feec987/larva_${breedingResult.tokenId}.json`).then((res) => res.json());
+                    const kidsJson = await fetch(`https://metadata-store.klaytnapi.com/1f5d655e-3529-df24-5f0a-65824feec987/larva_1000.json`).then((res) => res.json());
+                    setBreedingNftName(kidsJson.name);
+                    setBreedingNftImg(kidsJson.image);
+                    breedingHash = breedingResult.transactionHash;
                     breedIntroPlay();
                 } catch (e) {
-                    console.log(e);
+                    breedingError = e.message;
+                    console.log(breedingError);
                     setAlerts("breeding Fail ");
                     setShowAlertModal(true);
                     setShowBreedingModal(false);
                 }
                 // api 호출후 히스토리 요청
                 try {
-                    const breedingAfterResult = await POST(`/api/v1/larvaBreeding/log_after`, {
-                        breedingIdx,
-                        txHash: breedingResult.transactionHash,
+                    const breedingAfterResult = await POST(`/api/v1/breeding/log_after`, {
                         address: props.accounts[0],
+                        breedingIdx,
+                        txHash: breedingHash,
+                        errorMsg: breedingError,
                     }, props.apiToken);
                     console.log(breedingAfterResult)
                     if (breedingAfterResult.result === 'error') {
                         throw new Error(breedingAfterResult.error);
                     }
-
                 } catch (e) {
                     console.log(e);
                 }
@@ -169,9 +277,6 @@ function LarvaNFTBreeding(props) {
             setShowAlertModal(true);
             setShowBreedingModal(false);
         }
-
-
-
         return true;
     }
     const [breedIntroStatus, setBreedIntroStatus] = useState(false);
@@ -197,18 +302,20 @@ function LarvaNFTBreeding(props) {
     function initSecondToken() {
         setSecondToken({id:'',img:'',character:''});
     }
+    // nft 리스트 출력
     function myNftListOpen(sequence) {
-        console.log(props.accounts);
-        if (props.accounts[0]) {
-            setSelectBox(true);
-            setSelectSequence(sequence);
-        } else {
-            alert('지갑을 연결해주세요.');
+        if (!walletCheck()) {
+            return false;
         }
-
+        setSelectBox(true);
+        setSelectSequence(sequence);
     }
-
-
+    async function test(){
+        const kidsJson = await fetch(`https://metadata-store.klaytnapi.com/1f5d655e-3529-df24-5f0a-65824feec987/larva_1000.json`).then((res) => res.json());
+        setBreedingNftName(kidsJson.name);
+        setBreedingNftImg(kidsJson.image);
+        setShowBreedingResultModal(true);
+    }
     useEffect(() => {
         // 애니메이션 활성
         AOS.init({
@@ -286,7 +393,7 @@ function LarvaNFTBreeding(props) {
                                         className={styles.breeding_btn}><img src={BreedingOnButton}
                                                                              alt="breeding button"/></button>
                             ) : (
-                                <button onClick={() => alert("NFT를 선택해주세요.")}
+                                <button onClick={() => breedTokenIdCheck()}
                                         className={styles.breeding_btn}><img src={BreedingOffButton}
                                                                              alt="breeding button"/></button>
                             )}
@@ -336,10 +443,17 @@ function LarvaNFTBreeding(props) {
                                 tokenIdTimeCheck()
                             }}><img src={SearchButton} alt="search button"/></button>
                         </label>
-                        <div className={styles.time_box}>
-                            {'사용 불가능'}<br/>
-                            {'남은 시간 : 00:00:00'}
-                        </div>
+                        {
+                            coolTime != null && (
+                                <div className={styles.time_box}>
+                                    {`남은 시간 ${secondToTime(coolTime)}`}
+                                </div>
+
+                            )
+                        }
+                        <button onClick={() => test()}
+                                className={styles.breeding_btn}><img src={BreedingOnButton}
+                                                                     alt="breeding button"/></button>
                     </div>
                 </div>
             </section>
@@ -389,7 +503,7 @@ function LarvaNFTBreeding(props) {
                 <div className={styles.breeding_confirm}>
                     <div className={styles.nft_box}>
                         <img className={styles.nft_img} src={breedingNftImg} alt="breeding NFT"/>
-                        <span>#{breedingNftTokenId} Larva</span>
+                        <span>{breedingNftName}</span>
                     </div>
 
                     <button onClick={() => closeBreedingResultModal()}
