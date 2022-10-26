@@ -20,7 +20,7 @@ i18n
         // 초기 설정 언어
         lng: "ko",
         fallbackLng: "ko",
-        debug: true,
+        debug: false,
         defaultNS: "translations",
         ns: "translations",
         keySeparator: false,

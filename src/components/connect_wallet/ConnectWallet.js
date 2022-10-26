@@ -1,16 +1,16 @@
-import React, {useState,} from 'react'
+import React from 'react'
 import styles from "./ConnectWallet.module.scss"
 import klayIcon from "../../assets/images/icon/icon_klay.png";
 function ConnectWallet(props) {
 
-    const [isKaikasInstalled, setKaikasInstalled] = useState(false);
+    // const [isKaikasInstalled, setKaikasInstalled] = useState(false);
     const shortAddress = props.accounts.toString().replace(props.accounts.toString().substring(5, 37),'.....');
     function handleKaikas() {
 
         if (isKaikasWalletInstalled()) {
             props.handleKaikasConnect()
         } else {
-            setKaikasInstalled(true);
+            // setKaikasInstalled(true);
         }
 
     }
