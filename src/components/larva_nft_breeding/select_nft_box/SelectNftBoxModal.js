@@ -58,8 +58,6 @@ function SelectNftBoxModal(props) {
                 if (result.result === 'success') {
                     const nftList = result.data;
                     for (let index = 0; index < nftList.length; index++) {
-                        // Get num of each fruit
-                        console.log(nftList[index]);
                         if (props.firstToken.character === nftList[index].character || props.secondToken.character === nftList[index].character) {
                             nftList[index].status = 'same character';
                         }
@@ -69,21 +67,20 @@ function SelectNftBoxModal(props) {
                         if ('0x' + parseInt(props.secondToken.id).toString(16) === nftList[index].tokenId) {
                             nftList[index].status = 'selected';
                         }
-                        if(nftList[index].character == 'Pink' || nftList[index].character == 'Brown'){
+                        if(nftList[index].character === 'Pink' || nftList[index].character === 'Brown'){
                             try{
                                 const coolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, nftList[index].tokenId).call().then(e => {
                                     return e;
                                 })
                                 if(coolTime){
-                                    if(parseInt(coolTime[0]) > 0){
-                                        nftList[index].cooltime = secondToTime(coolTime[0]);
+                                    if(parseInt(coolTime) > 0){
+                                        nftList[index].cooltime = secondToTime(coolTime);
                                     }
                                 }
                             }catch (e){
                             }
                         }
                     }
-                    console.log(result.data);
                     setListItem(result.data);
                     setSelectModal(true);
                 } else {
