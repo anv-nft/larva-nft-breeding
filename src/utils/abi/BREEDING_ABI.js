@@ -1,4 +1,4 @@
-const BREEDING_ABI =[
+const BREEDING_ABI = [
 	{
 		"anonymous": false,
 		"inputs": [
@@ -16,8 +16,8 @@ const BREEDING_ABI =[
 			},
 			{
 				"indexed": false,
-				"internalType": "enum Breeder.breedingType",
-				"name": "_breedingType",
+				"internalType": "enum baby.legendaryType",
+				"name": "breedingType",
 				"type": "uint8"
 			}
 		],
@@ -81,8 +81,24 @@ const BREEDING_ABI =[
 			}
 		],
 		"name": "breeding",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "enum baby.legendaryType",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -104,35 +120,6 @@ const BREEDING_ABI =[
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_parent",
-				"type": "address"
-			},
-			{
-				"internalType": "uint8",
-				"name": "_value",
-				"type": "uint8"
-			}
-		],
-		"name": "getLarvaType",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
 			}
 		],
 		"stateMutability": "view",
@@ -185,9 +172,32 @@ const BREEDING_ABI =[
 				"internalType": "address",
 				"name": "childDataContract",
 				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "tokenAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "breedingFee",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_parent",
+				"type": "address"
+			}
+		],
+		"name": "reddem",
+		"outputs": [],
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -229,6 +239,24 @@ const BREEDING_ABI =[
 			}
 		],
 		"name": "setBaseURI",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_parent",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_breedingFee",
+				"type": "uint256"
+			}
+		],
+		"name": "setBreedingFee",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -283,7 +311,40 @@ const BREEDING_ABI =[
 			},
 			{
 				"internalType": "address",
+				"name": "tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "setTokenAddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_parent",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_parentDataContract",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_childDataContract",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
 				"name": "_child",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_tokenAddress",
 				"type": "address"
 			},
 			{
@@ -292,9 +353,9 @@ const BREEDING_ABI =[
 				"type": "string"
 			}
 		],
-		"name": "setting",
+		"name": "settingAll",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
