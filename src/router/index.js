@@ -30,7 +30,6 @@ function Index() {
 
     useEffect(() => {
         const isConnected = window.localStorage.getItem("isConnected");
-        console.log(isConnected);
         if (isConnected === 'YES') {
             connectKaikas();
         } else {
@@ -103,7 +102,7 @@ function Index() {
                 const token = localStorage.getItem('aniverse_token');
                 if (token === null) {
                     //토큰생성
-                    const res = await GET(`/api/v1/auth/larva_reveal/${account}/uuid`);
+                    const res = await GET(`/api/v1/auth/breeding/${account}/uuid`);
                     // sign
                     const message = res.uuid;
                     const provider = window['klaytn'];
@@ -112,7 +111,7 @@ function Index() {
                     await caver.klay.sign(message, account).then(async (message) => {
                         // get JWT
                         // jwt = await requestSignin(address, signedMessage);
-                        await POST(`/api/v1/auth/larva_reveal/signin`, {
+                        await POST(`/api/v1/auth/breeding/signin`, {
                             address: account,
                             message
                         }).then((sign) => {
