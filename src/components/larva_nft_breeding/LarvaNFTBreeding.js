@@ -301,22 +301,6 @@ function LarvaNFTBreeding(props) {
         setSelectSequence(sequence);
     }
 
-    async function test() {
-        setFirstToken({
-            id: 3333,
-            img: 'https://metadata-store.klaytnapi.com/1f5d655e-3529-df24-5f0a-65824feec987/fa6cd5c6-ba94-5ff0-245f-62feb2f24eb3.png',
-            character: 'Pink',
-        });
-        setSecondToken({
-            img: 'https://metadata-store.klaytnapi.com/1f5d655e-3529-df24-5f0a-65824feec987/8f60d82f-70b6-ecd8-827f-fa61b543c768.png',
-            id: 2984,
-            character: 'Brown'
-        });
-        if (!await legendaryCoolTimeCheck()) {
-            return false;
-        }
-    }
-
     useEffect(() => {
         // 애니메이션 활성
         AOS.init({
@@ -448,14 +432,11 @@ function LarvaNFTBreeding(props) {
                         {
                             coolTime != null && (
                                 <div className={styles.time_box}>
-                                    {`남은 시간 ${secondToTime(coolTime)}`}
+                                    {`LEGENDARY COOL TIME : ${secondToTime(coolTime)}`}
                                 </div>
 
                             )
                         }
-                        <button onClick={() => test()}
-                                className={styles.breeding_btn}><img src={BreedingOnButton}
-                                                                     alt="breeding button"/></button>
                     </div>
                 </div>
             </section>
