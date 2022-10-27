@@ -174,22 +174,22 @@ function LarvaNFTBreeding(props) {
             setShowAlertModal(true);
             return false;
         }
-        if (!await approveCheck()){
+        if (!await approveCheck()) {
             const balanceAmount = await kanvContract.methods.balanceOf(props.accounts[0]).call();
             if (Number.parseFloat(breedingKanv) > Number.parseFloat(balanceAmount)) {
                 setAlerts("The KANV is insufficient.");
                 setShowAlertModal(true);
                 return false;
             }
-            try{
-                const gasLimitApprove =await kanvContract.methods.approve(BREEDING_CONTRACT_ADDRESS,breedingKanv).estimateGas({
+            try {
+                const gasLimitApprove = await kanvContract.methods.approve(BREEDING_CONTRACT_ADDRESS, breedingKanv).estimateGas({
                     from: props.accounts[0],
                 });
-                const approveResult = await kanvContract.methods.approve(BREEDING_CONTRACT_ADDRESS,breedingKanv).send({
+                await kanvContract.methods.approve(BREEDING_CONTRACT_ADDRESS, breedingKanv).send({
                     from: props.accounts[0],
                     gas: gasLimitApprove
                 });
-            } catch (e){
+            } catch (e) {
                 console.log(e);
                 return false;
             }
@@ -198,7 +198,6 @@ function LarvaNFTBreeding(props) {
         let breedingResult;
         let breedingError
         let breedingHash = null;
-        let alertMsg = `Token ID ${firstToken.id} + ${secondToken.id} breed Success`; // 에러메세지
         try {
             // api 호출전 히스토리 요청
             const breedingBeforeResult = await POST(`/api/v1/breeding/log_before`, {
@@ -501,7 +500,7 @@ function LarvaNFTBreeding(props) {
             {selectBox ? (
                 <SelectNftBoxModal selectBox={selectBox} setSelectBox={setSelectBox} nftContract={nftContract}
                                    userAddress={props.accounts[0]} networkId={props.networkId}
-                                   setFirstToken={setFirstToken}
+                                   setFirstToken={setFirstToken} breedingContract={breedingContract} PFP_3D_NFT_CONTRACT_ADDRESS={PFP_3D_NFT_CONTRACT_ADDRESS}
                                    firstToken={firstToken} secondToken={secondToken} setSecondToken={setSecondToken}
                                    selectSequence={selectSequence}
                                    setShowLoading={setShowLoading}/>) : (<></>)

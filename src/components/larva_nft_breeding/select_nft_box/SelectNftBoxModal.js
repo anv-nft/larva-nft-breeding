@@ -1,22 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import {Modal} from 'react-bootstrap';
 import {POST} from "../../../api/api";
-import Caver from "caver-js";
 import styles from "./SelectNftBoxModal.module.scss"
 import iconX from "../../../assets/images/icon/icon_x_s.png";
-import {contracts} from "../../../utils/web3/contracts";
-import {BREEDING_ABI} from "../../../utils/abi/BREEDING_ABI";
 import {secondToTime} from "../../../utils/anvUtils";
 function SelectNftBoxModal(props) {
     const [selectModal, setSelectModal] = useState(false);
     const [listItem, setListItem] = useState([]);
     const [selectedNft, setSelectedNft] = useState("");
-
-    const provider = window['klaytn'];
-    const caver = new Caver(provider);
-    const BREEDING_CONTRACT_ADDRESS = contracts['breeding_contract'][props.networkId];
-    const PFP_3D_NFT_CONTRACT_ADDRESS = contracts['pfp_3d_nft_contract'][props.networkId];
-    const breedingContract = new caver.klay.Contract(BREEDING_ABI, BREEDING_CONTRACT_ADDRESS);
 
     function selectNft(e) {
         const box = e.currentTarget;
@@ -69,7 +60,7 @@ function SelectNftBoxModal(props) {
                         }
                         if(nftList[index].character === 'Pink' || nftList[index].character === 'Brown'){
                             try{
-                                const coolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, nftList[index].tokenId).call().then(e => {
+                                const coolTime = await props.breedingContract.methods.getCoolTime(props.PFP_3D_NFT_CONTRACT_ADDRESS, nftList[index].tokenId).call().then(e => {
                                     return e;
                                 })
                                 if(coolTime){
