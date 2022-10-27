@@ -102,7 +102,7 @@ function SelectNftBoxModal(props) {
                         <div>
                             {(selectedNft) ? (
                                 <div className={styles.on_status} onClick={() => selectComplete()}>
-                                    breed
+                                    Select
                                 </div>
                             ) : (
                                 <div className={styles.off_status}>
@@ -125,7 +125,10 @@ function SelectNftBoxModal(props) {
                                     <span className={styles.hide}>{nft.character}</span>
                                     {
                                         (nft.cooltime) &&
-                                        <span className={styles.coolTime}>COOLTIME : {nft.cooltime}</span>
+                                        <span className={styles.coolTime}>
+                                            LEGENDARY COOL TIME<br/>
+                                            <span>{nft.cooltime}</span>
+                                        </span>
                                     }
                                     <div className={styles.selected_dim}>{nft.status}</div>
                                 </div>
@@ -138,7 +141,10 @@ function SelectNftBoxModal(props) {
                                     <span className={styles.hide}>{nft.character}</span>
                                     {
                                         (nft.cooltime) &&
-                                        <span className={styles.coolTime}>COOLTIME : {nft.cooltime}</span>
+                                        <span className={styles.coolTime}>
+                                            LEGENDARY COOL TIME<br/>
+                                            <span>{nft.cooltime}</span>
+                                        </span>
                                     }
                                 </div>
                             )
