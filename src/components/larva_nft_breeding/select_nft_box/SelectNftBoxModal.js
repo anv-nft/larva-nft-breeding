@@ -79,9 +79,7 @@ function SelectNftBoxModal(props) {
             });
             props.setShowLoading(false);
         }
-
         getNft();
-
     }, [props.selectBox]);
     return (
         <Modal id={styles.myNftBox} centered size="xs" show={selectModal}
@@ -118,7 +116,7 @@ function SelectNftBoxModal(props) {
                                         (nft.cooltime) &&
                                         <span className={styles.coolTime}>
                                             LEGENDARY COOL TIME<br/>
-                                            <span>{nft.cooltime}</span>
+                                            <span className={`countTimer`}>{nft.cooltime}</span>
                                         </span>
                                     }
                                     <div className={styles.selected_dim}>{nft.status}</div>
@@ -134,7 +132,7 @@ function SelectNftBoxModal(props) {
                                         (nft.cooltime) &&
                                         <span className={styles.coolTime}>
                                             LEGENDARY COOL TIME<br/>
-                                            <span>{nft.cooltime}</span>
+                                            <span className={`countTimer`}>{nft.cooltime}</span>
                                         </span>
                                     }
                                 </div>

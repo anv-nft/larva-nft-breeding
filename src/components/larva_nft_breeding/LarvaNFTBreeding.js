@@ -10,7 +10,7 @@ import {PAUSABLE_NFT} from "../../utils/abi/PAUSABLE_NFT";
 import {BREEDING_ABI} from "../../utils/abi/BREEDING_ABI";
 import {ERC20_ABI} from "../../utils/abi/ERC20";
 import {contracts} from "../../utils/web3/contracts";
-import {secondToTime} from "../../utils/anvUtils";
+import {secondToTime, drawTime} from "../../utils/anvUtils";
 import Web3 from "web3";
 import Caver from "caver-js";
 import SelectNftBoxModal from "./select_nft_box/SelectNftBoxModal";
@@ -218,7 +218,6 @@ function LarvaNFTBreeding(props) {
                     // })
                     const gasLimit = 1000000
                     const gasPrice = await caver.klay.getGasPrice();
-                    console.log(gasPrice);
                     breedingResult = await breedingContract.methods.breeding(PFP_3D_NFT_CONTRACT_ADDRESS, firstToken.id, secondToken.id).send({
                         from: props.accounts[0],
                         gas: gasLimit,
@@ -305,6 +304,7 @@ function LarvaNFTBreeding(props) {
         AOS.init({
             duration: 1000
         });
+        setInterval(drawTime, 1000);
     }, []);
 
     return (
@@ -431,7 +431,7 @@ function LarvaNFTBreeding(props) {
                         {
                             coolTime != null && (
                                 <div className={styles.time_box}>
-                                    {`LEGENDARY COOL TIME : ${secondToTime(coolTime)}`}
+                                    LEGENDARY COOL TIME : <span class="countTimer">{secondToTime(coolTime)}</span>
                                 </div>
 
                             )
