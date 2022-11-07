@@ -319,3 +319,36 @@
     }
   }
 }
+.alert_msg {
+  font-family: 'Poppins';
+  font-weight: 700;
+  font-size: 1.8rem;
+  white-space: pre-wrap;
+
+  &_span {
+    font-size: 1rem;
+    font-weight: 400;
+    color: red
+  }
+}
+
+.alert_box {
+  justify-content: center !important;
+  .alert_btn {
+    display: inline-block;
+    text-align: center;
+    font-family: 'Poppins';
+    font-size: 1.5rem;
+    background: #ccc;
+    color: #000;
+    border-radius: 1rem;
+    border: none;
+    padding: 5px 20px;
+  }
+
+  .mint_btn {
+    padding: 5px 10px;
+    font-weight: 400;
+    font-size: 1.5rem;
+  }
+}

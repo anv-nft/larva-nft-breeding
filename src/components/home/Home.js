@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Link} from "react-router-dom";
-import { Swiper, SwiperSlide } from 'swiper/react';
+import {Swiper, SwiperSlide} from 'swiper/react';
 import "swiper/swiper.scss";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -18,21 +18,36 @@ import IconOpenSea from "../../assets/images/icon/icon_opensea.png";
 import StoryBackground from "../../assets/images/home/back_story.png";
 import StoryVisual from "../../assets/images/home/frame.png";
 import styles from "./Home.module.scss";
+import {Modal} from "react-bootstrap";
 
 export default function Home(props) {
 
-    const [faqStatus,setFaqStatus] = useState(0);
+    const [faqStatus, setFaqStatus] = useState(0);
+    const [showAlertModal, setShowAlertModal] = useState(false); // 알림창 모달
+    const [alerts, setAlerts] = useState(""); // 알림 메세지
+    function closeAlert() {
+        setShowAlertModal(false);
+        setAlerts("");
+    }
 
-    function faqToggle(index){
-        if(faqStatus === index){
+    // 지갑연결 확인
+    function breedingAlert() {
+        setAlerts(`${props.t("breeding_date")} \n2022/11/8 20:00 ~ 2022/11/9 20:00`);
+        setShowAlertModal(true);
+        return false;
+    }
+
+    function faqToggle(index) {
+        if (faqStatus === index) {
             setFaqStatus(0);
-        }else {
+        } else {
             setFaqStatus(index);
         }
     }
+
     useEffect(() => {
         AOS.init({
-            duration : 1000
+            duration: 1000
         });
     });
     return (
@@ -40,18 +55,21 @@ export default function Home(props) {
             <section className={styles.visual_section}>
                 <img className={styles.background_img} src={VisualBackground} alt="Visual Background"/>
                 <img src={VisualLogo} alt="VisualLogo"/><br/>
-                {(props.openedStatus === "open") ?(
+                {(props.openedStatus === "open") ? (
                     <Link data-aos="zoom-out" to="/breeding" className={styles.hrefButton}>
                         {props.t("breeding_btn")}
                     </Link>
-                ):(
-                    <Link data-aos="zoom-out" onClick={() =>{ alert('브리딩 기간 \n2022/11/8 20:00 ~ 2022/11/9 20:00') }} className={styles.hrefButton}>
+                ) : (
+                    <Link data-aos="zoom-out" onClick={() => {
+                        breedingAlert()
+                    }} className={styles.hrefButton}>
                         {props.t("breeding_btn")}
                     </Link>
                 )
                 }
                 <img data-aos="fade-up" data-aos-duration="1000"
-                     data-aos-anchor-placement="top-bottom" className={styles.characterImg} src={VisualCharacter} alt="VisualCharacter"/>
+                     data-aos-anchor-placement="top-bottom" className={styles.characterImg} src={VisualCharacter}
+                     alt="VisualCharacter"/>
             </section>
             <section className={styles.nft_section} id="LARVA_KIDS_NFT">
                 <img className={styles.kids_logo} src={KidsLogo} alt="KidsLogo"/><br/>
@@ -65,7 +83,8 @@ export default function Home(props) {
                     <SwiperSlide className={styles.swiper_img}><img src={Nft03} alt="Nft03"/></SwiperSlide>
                     <SwiperSlide className={styles.swiper_img}><img src={Nft04} alt="Nft04"/></SwiperSlide>
                     <SwiperSlide className={styles.swiper_img}><img src={Nft05} alt="Nft05"/></SwiperSlide>
-                </Swiper>                <div>
+                </Swiper>
+                <div>
                     <a data-aos="zoom-out" href="#" className={styles.hrefButton}>
                         <img src={IconOpenSea} alt="IconOpenSea"/> Buy on OpenSea
                     </a>
@@ -82,13 +101,17 @@ export default function Home(props) {
                         <div data-aos="zoom-in" data-aos-duration="2000">
                             <h2>{props.t("story_title")}</h2>
                             <p>
-                                {props.t("story_01").split("\n").map((line,index) => (<span key={index}>{line}</span>))}
+                                {props.t("story_01").split("\n").map((line, index) => (
+                                    <span key={index}>{line}</span>))}
                                 <br/>
-                                {props.t("story_02").split("\n").map((line,index) => (<span key={index}>{line}</span>))}
+                                {props.t("story_02").split("\n").map((line, index) => (
+                                    <span key={index}>{line}</span>))}
                                 <br/>
-                                {props.t("story_03").split("\n").map((line,index) => (<span key={index}>{line}</span>))}
+                                {props.t("story_03").split("\n").map((line, index) => (
+                                    <span key={index}>{line}</span>))}
                                 <br/>
-                                {props.t("story_04").split("\n").map((line,index) => (<span key={index}>{line}</span>))}
+                                {props.t("story_04").split("\n").map((line, index) => (
+                                    <span key={index}>{line}</span>))}
                                 <br/>
                             </p>
                         </div>
@@ -154,7 +177,8 @@ export default function Home(props) {
                 <div data-aos="fade-up" className={styles.faq_content}>
                     <ul>
                         <li>
-                            <div className={`${styles.q} ${faqStatus === 1 ? styles.faq_q_active : ""}`} onClick={() => faqToggle(1)}>
+                            <div className={`${styles.q} ${faqStatus === 1 ? styles.faq_q_active : ""}`}
+                                 onClick={() => faqToggle(1)}>
                                 <p>{props.t("faq_q_01")}</p>
                             </div>
                             <div className={`${styles.a} ${faqStatus === 1 ? styles.faq_a_active : ""}`}>
@@ -164,7 +188,8 @@ export default function Home(props) {
                             </div>
                         </li>
                         <li>
-                            <div className={`${styles.q} ${faqStatus === 2 ? styles.faq_q_active : ""}`} onClick={() => faqToggle(2)}>
+                            <div className={`${styles.q} ${faqStatus === 2 ? styles.faq_q_active : ""}`}
+                                 onClick={() => faqToggle(2)}>
                                 <p>{props.t("faq_q_02")}</p>
                             </div>
                             <div className={`${styles.a} ${faqStatus === 2 ? styles.faq_a_active : ""}`}>
@@ -174,7 +199,8 @@ export default function Home(props) {
                             </div>
                         </li>
                         <li>
-                            <div className={`${styles.q} ${faqStatus === 3 ? styles.faq_q_active : ""}`} onClick={() => faqToggle(3)}>
+                            <div className={`${styles.q} ${faqStatus === 3 ? styles.faq_q_active : ""}`}
+                                 onClick={() => faqToggle(3)}>
                                 <p>{props.t("faq_q_03")}</p>
                             </div>
                             <div className={`${styles.a} ${faqStatus === 3 ? styles.faq_a_active : ""}`}>
@@ -184,7 +210,8 @@ export default function Home(props) {
                             </div>
                         </li>
                         <li>
-                            <div className={`${styles.q} ${faqStatus === 4 ? styles.faq_q_active : ""}`} onClick={() => faqToggle(4)}>
+                            <div className={`${styles.q} ${faqStatus === 4 ? styles.faq_q_active : ""}`}
+                                 onClick={() => faqToggle(4)}>
                                 <p>{props.t("faq_q_04")}</p>
                             </div>
                             <div className={`${styles.a} ${faqStatus === 4 ? styles.faq_a_active : ""}`}>
@@ -194,7 +221,8 @@ export default function Home(props) {
                             </div>
                         </li>
                         <li>
-                            <div className={`${styles.q} ${faqStatus === 5 ? styles.faq_q_active : ""}`} onClick={() => faqToggle(5)}>
+                            <div className={`${styles.q} ${faqStatus === 5 ? styles.faq_q_active : ""}`}
+                                 onClick={() => faqToggle(5)}>
                                 <p>{props.t("faq_q_05")}</p>
                             </div>
                             <div className={`${styles.a} ${faqStatus === 5 ? styles.faq_a_active : ""}`}>
@@ -206,6 +234,20 @@ export default function Home(props) {
                     </ul>
                 </div>
             </section>
+            {/*알림창 모달*/}
+            <Modal centered show={showAlertModal}
+                   onHide={() => closeAlert()}>
+                <Modal.Body>
+                    <div className="text-center mt-5">
+                        <p className={styles.alert_msg}> {alerts}</p>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer className={styles.alert_box}>
+                    <button variant="" onClick={() => closeAlert()} className={styles.alert_btn}>
+                        Close
+                    </button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 }
