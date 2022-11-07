@@ -9,7 +9,6 @@ function secondToTime(seconds) {
 }
 
 function timeToSecond(time) {
-    console.log(time);
     const array = time.split(':')
     const h = parseInt(array[0]) * 60 * 60;
     const m = parseInt(array[1]) * 60;
