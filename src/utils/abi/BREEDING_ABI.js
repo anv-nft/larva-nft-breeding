@@ -17,7 +17,7 @@ const BREEDING_ABI = [
 			{
 				"indexed": false,
 				"internalType": "enum baby.legendaryType",
-				"name": "breedingType",
+				"name": "_breedingType",
 				"type": "uint8"
 			}
 		],
