@@ -15,7 +15,7 @@ function Footer() {
     return (
         <footer className={`${styles.footer} ${(location.pathname === '/breeding') && styles.breeding_footer}`}>
             <div>
-                <img src={logo} style={{width: '200px'}}/>
+                <img src={logo} style={{width: '200px'}} alt={`logo_img`}/>
             </div>
             <div className={styles.icon_list}>
                 <a href="https://larvanft.aniverse.io/" target="_blank" rel="noopener noreferrer"><img src={(location.pathname === '/breeding') ? aniverseIcon : aniverseIconGray} alt="aniverse.io"/></a>

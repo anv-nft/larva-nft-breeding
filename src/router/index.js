@@ -13,6 +13,7 @@ import {CHANGE_ADDRESS} from "../store/actions/walletAddress";
 import LarvaNFTBreeding from "../components/larva_nft_breeding/LarvaNFTBreeding";
 import {useTranslation} from "react-i18next";
 import i18next from "../lang/i18n";
+
 function Index() {
     const {t} = useTranslation();
     const {account, active, activate, deactivate} = useWeb3React();
@@ -24,19 +25,22 @@ function Index() {
     const [language, setLanguage] = useState("ko");
     const [openedStatus, setOpenedStatus] = useState("close");
 
-    const langChangeHandler = (lang) =>{
+    const langChangeHandler = (lang) => {
         setLanguage(lang);
         i18next.changeLanguage(lang);
     }
 
-    useEffect(async () => {
-        const status = await GET(`/api/v1/breeding/isOpened`);
-        if(status.result === 'success'){
-            setOpenedStatus("open");
+    useEffect(() => {
+        async function openedCheck() {
+            const status = await GET(`/api/v1/breeding/isOpened`);
+            if (status.result === 'success') {
+                setOpenedStatus("open");
+            }
+            console.log(status);
         }
-        console.log(status);
 
-        if(window.location.pathname === '/breeding'){
+        openedCheck();
+        if (window.location.pathname === '/breeding') {
             const isConnected = window.localStorage.getItem("isConnected");
             if (isConnected === 'YES') {
                 connectKaikas();
@@ -52,6 +56,7 @@ function Index() {
         async function logoutEffect() {
             await logout();
         }
+
         if (didMount.current) {
             didMount.current = false;
             return;
@@ -169,15 +174,15 @@ function Index() {
             console.log(e);
         }
     }
+
     return (
 
         <Router>
-            <Header accounts={accounts} apiToken={apiToken} isConnected={isConnectedWallet} networkId={networkId} openedStatus={openedStatus}
-                    handleKaikasConnect={() => connectKaikas()} handleLogout={() => logout()} langChangeHandler={langChangeHandler}  t={t} language={language}/>
+            <Header accounts={accounts} apiToken={apiToken} isConnected={isConnectedWallet} networkId={networkId}
+                    openedStatus={openedStatus}
+                    handleKaikasConnect={() => connectKaikas()} handleLogout={() => logout()}
+                    langChangeHandler={langChangeHandler} t={t} language={language}/>
             <Routes>
-                <Route exact path="/"
-                       element={<Home t={t} openedStatus={openedStatus}/>}>
-                </Route>
                 {
                     (openedStatus === "open") &&
                     <Route exact path="/breeding" element={<LarvaNFTBreeding accounts={accounts} apiToken={apiToken}
