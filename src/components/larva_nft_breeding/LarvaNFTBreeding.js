@@ -225,7 +225,7 @@ function LarvaNFTBreeding(props) {
                     });
                     console.log(breedingResult); // 브리딩 결과값
                     console.log(`breed Token ID : ${breedingResult.events.Breeded.returnValues[1]}`);
-                    const kidsJson = await fetch(`https://metadata-store.klaytnapi.com/1f5d655e-3529-df24-5f0a-65824feec987/larva_${breedingResult.events.Breeded.returnValues[1]}.json`).then((res) => res.json());
+                    const kidsJson = await fetch(`https://metadata-store.klaytnapi.com/1f5d655e-3529-df24-5f0a-65824feec987/larva-kids-${breedingResult.events.Breeded.returnValues[1]}.json`).then((res) => res.json());
                     setBreedingNftName(kidsJson.name);
                     setBreedingNftImg(kidsJson.image);
                     breedingHash = breedingResult.transactionHash;
