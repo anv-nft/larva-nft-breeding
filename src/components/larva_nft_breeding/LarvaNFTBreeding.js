@@ -39,11 +39,12 @@ function LarvaNFTBreeding(props) {
     const [showBreedingModal, setShowBreedingModal] = useState(false); // 브리딩 확인 모달
     const [showBreedingResultModal, setShowBreedingResultModal] = useState(false); // 브리딩 완료 모달
     const [alerts, setAlerts] = useState(""); // 알림 메세지
+    // 알림창 닫기
     function closeAlert() {
         setShowAlertModal(false);
         setAlerts("");
     }
-
+    // 브리딩 완료 창 닫기
     function closeBreedingResultModal() {
         setShowBreedingResultModal(false);
         setBreedingNftName("");
@@ -66,7 +67,7 @@ function LarvaNFTBreeding(props) {
     const nftContract = new caver.klay.Contract(PAUSABLE_NFT, PFP_3D_NFT_CONTRACT_ADDRESS);
     const kanvContract = new caver.klay.Contract(ERC20_ABI, KANV_CONTRACT_ADDRESS);
     const breedingKanv = Web3.utils.toWei('50', 'ether')
-
+    // 브리딩에 필요한 부모 토큰 ID 체크
     function breedTokenIdCheck() {
         if (firstToken.id === "" || secondToken.id === "") {
             setAlerts("Please select your NFT.");
@@ -90,7 +91,6 @@ function LarvaNFTBreeding(props) {
 
     // 지갑연결 확인
     function walletCheck() {
-        console.log(props.accounts[0]);
         if (props.accounts[0] === undefined) {
             setAlerts("Please connect wallet.");
             setShowAlertModal(true);
@@ -109,7 +109,7 @@ function LarvaNFTBreeding(props) {
         }
         return true;
     }
-
+    // 토큰 쿨타임 확인
     async function tokenIdTimeCheck() {
         if (!walletCheck()) {
             return false;
@@ -168,12 +168,13 @@ function LarvaNFTBreeding(props) {
         if (!breedTokenIdCheck()) {
             return false;
         }
-        const legendaryCoolTimeResult = await legendaryCoolTimeCheck();
+        const legendaryCoolTimeResult = await legendaryCoolTimeCheck(); // 레전더리 쿨타임 확인
         if (legendaryCoolTimeResult !== null) {
             setAlerts("Wait CoolTime\n" + secondToTime(legendaryCoolTimeResult));
             setShowAlertModal(true);
             return false;
         }
+        // 어프로브 체크
         if (!await approveCheck()) {
             const balanceAmount = await kanvContract.methods.balanceOf(props.accounts[0]).call();
             if (Number.parseFloat(breedingKanv) > Number.parseFloat(balanceAmount)) {
@@ -205,7 +206,6 @@ function LarvaNFTBreeding(props) {
                 secondTokenId: secondToken.id,
                 address: props.accounts[0],
             }, props.apiToken);
-            console.log(breedingBeforeResult)
             if (breedingBeforeResult.result === 'error') {
                 throw new Error(breedingBeforeResult.error);
             }
@@ -213,10 +213,10 @@ function LarvaNFTBreeding(props) {
             if (breedingIdx) {
                 // 브리딩 실행
                 try {
-                    // const gasLimit = await breedingContract.methods.breeding(PFP_3D_NFT_CONTRACT_ADDRESS, firstToken.id, secondToken.id).estimateGas({
-                    //     from: props.accounts[0],
-                    // })
-                    const gasLimit = 1000000
+                    const gasLimit = await breedingContract.methods.breeding(PFP_3D_NFT_CONTRACT_ADDRESS, firstToken.id, secondToken.id).estimateGas({
+                        from: props.accounts[0],
+                    });
+                    // const gasLimit = 1000000;
                     const gasPrice = await caver.klay.getGasPrice();
                     breedingResult = await breedingContract.methods.breeding(PFP_3D_NFT_CONTRACT_ADDRESS, firstToken.id, secondToken.id).send({
                         from: props.accounts[0],
@@ -229,7 +229,7 @@ function LarvaNFTBreeding(props) {
                     setBreedingNftName(kidsJson.name);
                     setBreedingNftImg(kidsJson.image);
                     breedingHash = breedingResult.transactionHash;
-                    breedIntroPlay();
+                    breedIntroPlay(); // 영상재생
                 } catch (e) {
                     breedingError = e.message;
                     console.log(breedingError);

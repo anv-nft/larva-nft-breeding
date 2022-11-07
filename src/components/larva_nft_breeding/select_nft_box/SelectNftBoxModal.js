@@ -45,7 +45,6 @@ function SelectNftBoxModal(props) {
             await POST(`/api/v1/breeding/getNft`, {
                 address,
             }, token).then(async (result) => {
-                console.log(result);
                 if (result.result === 'success') {
                     const nftList = result.data;
                     for (let index = 0; index < nftList.length; index++) {
