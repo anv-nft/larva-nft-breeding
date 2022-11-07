@@ -40,9 +40,16 @@ export default function Home(props) {
             <section className={styles.visual_section}>
                 <img className={styles.background_img} src={VisualBackground} alt="Visual Background"/>
                 <img src={VisualLogo} alt="VisualLogo"/><br/>
-                <Link data-aos="zoom-out" to="/breeding" className={styles.hrefButton}>
-                    {props.t("breeding_btn")}
-                </Link>
+                {(props.openedStatus === "open") ?(
+                    <Link data-aos="zoom-out" to="/breeding" className={styles.hrefButton}>
+                        {props.t("breeding_btn")}
+                    </Link>
+                ):(
+                    <Link data-aos="zoom-out" onClick={() =>{ alert('브리딩 기간 \n2022/11/8 20:00 ~ 2022/11/9 20:00') }} className={styles.hrefButton}>
+                        {props.t("breeding_btn")}
+                    </Link>
+                )
+                }
                 <img data-aos="fade-up" data-aos-duration="1000"
                      data-aos-anchor-placement="top-bottom" className={styles.characterImg} src={VisualCharacter} alt="VisualCharacter"/>
             </section>
@@ -52,8 +59,6 @@ export default function Home(props) {
                     className={styles.nft_list_box}
                     spaceBetween={50}
                     slidesPerView={4}
-                    onSlideChange={() => console.log('slide change')}
-                    onSwiper={(swiper) => console.log(swiper)}
                 >
                     <SwiperSlide className={styles.swiper_img}><img src={Nft01} alt="Nft01"/></SwiperSlide>
                     <SwiperSlide className={styles.swiper_img}><img src={Nft02} alt="Nft02"/></SwiperSlide>

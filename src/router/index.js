@@ -22,20 +22,29 @@ function Index() {
     const [networkId, setNetworkId] = useState(1);
     const [isConnectedWallet, setConnectWallet] = useState(undefined);
     const [language, setLanguage] = useState("ko");
+    const [openedStatus, setOpenedStatus] = useState("close");
 
     const langChangeHandler = (lang) =>{
         setLanguage(lang);
         i18next.changeLanguage(lang);
     }
 
-    useEffect(() => {
-        const isConnected = window.localStorage.getItem("isConnected");
-        if (isConnected === 'YES') {
-            connectKaikas();
-        } else {
-            setConnectWallet("NO");
+    useEffect(async () => {
+        const status = await GET(`/api/v1/breeding/isOpened`);
+        if(status.result === 'success'){
+            setOpenedStatus("open");
         }
-        checkWalletClosed();
+        console.log(status);
+
+        if(window.location.pathname === '/breeding'){
+            const isConnected = window.localStorage.getItem("isConnected");
+            if (isConnected === 'YES') {
+                connectKaikas();
+            } else {
+                setConnectWallet("NO");
+            }
+            checkWalletClosed();
+        }
     }, []);
 
 
@@ -163,17 +172,23 @@ function Index() {
     return (
 
         <Router>
-            <Header accounts={accounts} apiToken={apiToken} isConnected={isConnectedWallet} networkId={networkId}
+            <Header accounts={accounts} apiToken={apiToken} isConnected={isConnectedWallet} networkId={networkId} openedStatus={openedStatus}
                     handleKaikasConnect={() => connectKaikas()} handleLogout={() => logout()} langChangeHandler={langChangeHandler}  t={t} language={language}/>
             <Routes>
                 <Route exact path="/"
-                       element={<Home t={t}/>}>
+                       element={<Home t={t} openedStatus={openedStatus}/>}>
                 </Route>
-                <Route exact path="/breeding" element={<LarvaNFTBreeding accounts={accounts} apiToken={apiToken}
-                                                                         isConnected={isConnectedWallet}
-                                                                         networkId={networkId}
-                                                                         handleKaikasConnect={() => connectKaikas()}
-                                                                         handleLogout={() => logout()}/>}>
+                {
+                    (openedStatus === "open") &&
+                    <Route exact path="/breeding" element={<LarvaNFTBreeding accounts={accounts} apiToken={apiToken}
+                                                                             isConnected={isConnectedWallet}
+                                                                             networkId={networkId}
+                                                                             handleKaikasConnect={() => connectKaikas()}
+                                                                             handleLogout={() => logout()}/>}>
+                    </Route>
+                }
+                <Route exact path="*"
+                       element={<Home t={t} openedStatus={openedStatus}/>}>
                 </Route>
             </Routes>
             <Footer/>

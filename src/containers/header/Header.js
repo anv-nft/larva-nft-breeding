@@ -22,36 +22,7 @@ function Header(props) {
         <>
             <div className={styles.header}>
                 <img className={styles.logo_img} src={logo} alt="header logo"/>
-                {location.pathname === '/' ? (
-                    <>
-                        <HashLink to="#LARVA_KIDS_NFT">
-                            {props.t('LARVA_KIDS_NFT')}
-                        </HashLink>
-                        <HashLink to="#STORY">
-                            {props.t('STORY')}
-                        </HashLink>
-                        <HashLink to="#ROADMAP">
-                            {props.t('ROADMAP')}
-                        </HashLink>
-                        <HashLink to="#FAQ">
-                            {props.t('FAQ')}
-                        </HashLink>
-                        <div>
-                        {props.language === 'ko' ? (
-                            <button className={styles.img_button} onClick={() => props.langChangeHandler("en")}><img src={engButton} alt="ENG Button"/></button>
-                        ) : (
-                            <button className={styles.img_button} onClick={() => props.langChangeHandler("ko")}><img src={koButton} alt="KO Button"/></button>
-                        )}
-                            <button className={styles.img_button} onClick={() => menuToggle()}><img src={menuButton} alt="menu Button"/></button>
-                            <div className={styles.menu_button} style={{display: menuStatus ? 'block' : 'none'}}>
-                                <a href="https://larvanft.aniverse.io/" target="_blank" rel="noopener noreferrer"><img src={aniverseIcon} alt="aniverse.io"/> {props.t('LARVA_NFT')}</a>
-                                <a href="https://discord.gg/larvanft" target="_blank" rel="noopener noreferrer"><img src={discordIcon} alt="discord link"/> {props.t('DISCORD')}</a>
-                                <a href="https://twitter.com/ANIVERSE_NFT" target="_blank" rel="noopener noreferrer"><img src={twitterIcon} alt="twitter link"/> {props.t('TWITTER')}</a>
-                                <a href="https://open.kakao.com/o/gCGOxhAc" target="_blank" rel="noopener noreferrer"><img src={kakaoIcon} alt="kakao link"/> {props.t('KAKAO')}</a>
-                            </div>
-                        </div>
-                    </>
-                ) : (
+                {props.openedStatus === "open" && location.pathname === '/breeding'  ? (
                     <>
                         {
                             props.accounts && props.accounts.length > 0 && props.isConnected === 'YES' ? (
@@ -70,6 +41,35 @@ function Header(props) {
                             )
 
                         }
+                    </>
+                ) : (
+                    <>
+                        <HashLink to="#LARVA_KIDS_NFT">
+                            {props.t('LARVA_KIDS_NFT')}
+                        </HashLink>
+                        <HashLink to="#STORY">
+                            {props.t('STORY')}
+                        </HashLink>
+                        <HashLink to="#ROADMAP">
+                            {props.t('ROADMAP')}
+                        </HashLink>
+                        <HashLink to="#FAQ">
+                            {props.t('FAQ')}
+                        </HashLink>
+                        <div>
+                            {props.language === 'ko' ? (
+                                <button className={styles.img_button} onClick={() => props.langChangeHandler("en")}><img src={engButton} alt="ENG Button"/></button>
+                            ) : (
+                                <button className={styles.img_button} onClick={() => props.langChangeHandler("ko")}><img src={koButton} alt="KO Button"/></button>
+                            )}
+                            <button className={styles.img_button} onClick={() => menuToggle()}><img src={menuButton} alt="menu Button"/></button>
+                            <div className={styles.menu_button} style={{display: menuStatus ? 'block' : 'none'}}>
+                                <a href="https://larvanft.aniverse.io/" target="_blank" rel="noopener noreferrer"><img src={aniverseIcon} alt="aniverse.io"/> {props.t('LARVA_NFT')}</a>
+                                <a href="https://discord.gg/larvanft" target="_blank" rel="noopener noreferrer"><img src={discordIcon} alt="discord link"/> {props.t('DISCORD')}</a>
+                                <a href="https://twitter.com/ANIVERSE_NFT" target="_blank" rel="noopener noreferrer"><img src={twitterIcon} alt="twitter link"/> {props.t('TWITTER')}</a>
+                                <a href="https://open.kakao.com/o/gCGOxhAc" target="_blank" rel="noopener noreferrer"><img src={kakaoIcon} alt="kakao link"/> {props.t('KAKAO')}</a>
+                            </div>
+                        </div>
                     </>
                 )}
             </div>
