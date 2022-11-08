@@ -30,9 +30,15 @@ export default function Home(props) {
         setAlerts("");
     }
 
-    // 지갑연결 확인
+    // 브리딩 시간안내
     function breedingAlert() {
         setAlerts(`${props.t("breeding_date")} \n2022/11/8 20:00 ~ 2022/11/9 20:00`);
+        setShowAlertModal(true);
+        return false;
+    }
+    //
+    function comingSoon() {
+        setAlerts(`Coming Soon`);
         setShowAlertModal(true);
         return false;
     }
@@ -85,10 +91,10 @@ export default function Home(props) {
                     <SwiperSlide className={styles.swiper_img}><img src={Nft05} alt="Nft05"/></SwiperSlide>
                 </Swiper>
                 <div>
-                    <a data-aos="zoom-out" href="#" className={styles.hrefButton}>
+                    <a data-aos="zoom-out" href="https://opensea.io/collection/larva-kids" target={"_blank"} className={styles.hrefButton}>
                         <img src={IconOpenSea} alt="IconOpenSea"/> Buy on OpenSea
                     </a>
-                    <a data-aos="zoom-out" href="#" className={styles.hrefButton}>
+                    <a data-aos="zoom-out" onClick={() => comingSoon()} className={styles.hrefButton}>
                         <img src={IconPala} alt="IconPala"/> Buy on PalaSquare
                     </a>
                 </div>
@@ -130,7 +136,7 @@ export default function Home(props) {
                             </div>
                         </div>
                     </div>
-                    <div data-aos="flip-right" className={`${styles.item} ${styles.complete}`}>
+                    <div data-aos="flip-right" className={`${styles.item} `}>
                         <p className={styles.num}><span>02</span></p>
                         <div className={styles.box}>
                             <div>
