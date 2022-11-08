@@ -94,7 +94,7 @@ export default function Home(props) {
                     <a data-aos="zoom-out" href="https://opensea.io/collection/larva-kids" target={"_blank"} className={styles.hrefButton}>
                         <img src={IconOpenSea} alt="IconOpenSea"/> Buy on OpenSea
                     </a>
-                    <a data-aos="zoom-out" onClick={() => comingSoon()} className={styles.hrefButton}>
+                    <a data-aos="zoom-out" href="https://pala.io/square/project/85f7b053e80db93c32b04248a921bff6ffe4fc92" target={"_blank"} className={styles.hrefButton}>
                         <img src={IconPala} alt="IconPala"/> Buy on PalaSquare
                     </a>
                 </div>
