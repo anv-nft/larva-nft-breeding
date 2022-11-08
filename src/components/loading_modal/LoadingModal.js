@@ -6,8 +6,8 @@ import styles from "./LodingModal.module.scss"
 function LoadingModal(props) {
 
     return (
-        <Modal className={styles.loading_box} centered size="xs" show={props.showLoading}
-               onHide={() => props.setShowLoading(false)}>
+        <Modal className={styles.loading_box} centered size="xs" show={props.showLoading} backdrop="static"
+               keyboard={false} onHide={() => props.setShowLoading(false)}>
             <Modal.Body>
                 <div className={styles.loading_box_text_001}> Loading...</div>
                 <div className={styles.loading}>
