@@ -66,7 +66,7 @@ function LarvaNFTBreeding(props) {
     const breedingContract = new caver.klay.Contract(BREEDING_ABI, BREEDING_CONTRACT_ADDRESS);
     const nftContract = new caver.klay.Contract(PAUSABLE_NFT, PFP_3D_NFT_CONTRACT_ADDRESS);
     const kanvContract = new caver.klay.Contract(ERC20_ABI, KANV_CONTRACT_ADDRESS);
-    const breedingKanv = Web3.utils.toWei('50', 'ether')
+    const breedingKanv = Web3.utils.toWei('500', 'ether')
     // 브리딩에 필요한 부모 토큰 ID 체크
     function breedTokenIdCheck() {
         if (firstToken.id === "" || secondToken.id === "") {
