@@ -142,7 +142,7 @@ function LarvaNFTBreeding(props) {
             firstCoolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, firstToken.id).call().then(e => {
                 return e;
             });
-            SecondCoolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, firstToken.id).call().then(e => {
+            SecondCoolTime = await breedingContract.methods.getCoolTime(PFP_3D_NFT_CONTRACT_ADDRESS, secondToken.id).call().then(e => {
                 return e;
             })
             time = parseInt(firstCoolTime) + parseInt(SecondCoolTime);
