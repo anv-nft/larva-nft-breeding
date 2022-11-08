@@ -8,6 +8,7 @@ import styles from "./LarvaNFTBreeding.module.scss"
 import breedIntro from "../../assets/images/breeding/breed_intro.mp4";
 import {PAUSABLE_NFT} from "../../utils/abi/PAUSABLE_NFT";
 import {BREEDING_ABI} from "../../utils/abi/BREEDING_ABI";
+import {DATA_CONTRACT} from "../../utils/abi/DATA_CONTRACT";
 import {ERC20_ABI} from "../../utils/abi/ERC20";
 import {contracts} from "../../utils/web3/contracts";
 import {secondToTime, drawTime} from "../../utils/anvUtils";
@@ -63,9 +64,11 @@ function LarvaNFTBreeding(props) {
     const BREEDING_CONTRACT_ADDRESS = contracts['breeding_contract'][props.networkId];
     const PFP_3D_NFT_CONTRACT_ADDRESS = contracts['pfp_3d_nft_contract'][props.networkId];
     const KANV_CONTRACT_ADDRESS = contracts['kanv_contract'][props.networkId];
+    const DATA_CONTRACT_ADDRESS = contracts['data_contract'][props.networkId];
     const breedingContract = new caver.klay.Contract(BREEDING_ABI, BREEDING_CONTRACT_ADDRESS);
     const nftContract = new caver.klay.Contract(PAUSABLE_NFT, PFP_3D_NFT_CONTRACT_ADDRESS);
     const kanvContract = new caver.klay.Contract(ERC20_ABI, KANV_CONTRACT_ADDRESS);
+    const dataContract = new caver.klay.Contract(DATA_CONTRACT, DATA_CONTRACT_ADDRESS);
     const breedingKanv = Web3.utils.toWei('500', 'ether')
     // 브리딩에 필요한 부모 토큰 ID 체크
     function breedTokenIdCheck() {
@@ -80,6 +83,7 @@ function LarvaNFTBreeding(props) {
     const searchTokenIdInput = useRef(); // 타임 검색용 토큰 ID
     const [searchTokenId, setSearchTokenId] = useState(""); // 타임 검색용 토큰 ID
     const [coolTime, setCoolTime] = useState(null); // 남은시간
+    const [legendaryCount, setLegendaryCount] = useState(200); // 남은시간
     // 숫자인지 체크
     const numberCheck = (e) => {
         const regex = /^[0-9\b -]{0,13}$/;
@@ -299,13 +303,31 @@ function LarvaNFTBreeding(props) {
         setSelectSequence(sequence);
     }
 
+
     useEffect(() => {
         // 애니메이션 활성
         AOS.init({
             duration: 1000
         });
+        // 레전더리 갯수
         setInterval(drawTime, 1000);
     }, []);
+
+    useEffect(() => {
+        if(dataContract){
+            async function getLegendaryCount() {
+                try {
+                    const count = await dataContract.methods.getAmount(1).call();
+                    setLegendaryCount(200 - count);
+                } catch (e) {
+                    console.log(e);
+                    return false
+                }
+                return false
+            }
+            getLegendaryCount();
+        }
+    }, [dataContract]);
 
     return (
         <>
@@ -339,6 +361,10 @@ function LarvaNFTBreeding(props) {
                             브리딩 할 수 있으며, 선착순으로 마감됩니다.<br/>
                             마감 이후 부터는 일반 Larva Kids NFT 브리딩만 가능합니다.<br/>
                         </p>
+                        <h3>
+                            남은 레전더리 라바 키즈<br/>
+                            <span>{legendaryCount}</span>
+                        </h3>
                     </div>
                     <div className={styles.select_view_box}>
                         {(firstToken.img) ? (

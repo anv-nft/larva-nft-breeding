@@ -11,6 +11,10 @@ const contracts = {
         1001: "0xc15e1cba7f5037a9815bbda48c83b394ea3463ab",  // klaytn testnet
         8217: "0x3829952ba3f6efeb977bcefad509d0b4803d6e83",  // klaytn mainnet
     },
+    data_contract: {
+        1001: "",  // klaytn testnet
+        8217: "0x16Edb17d41989fB50b69F00Fb09103E7B0C7f692",  // klaytn mainnet
+    }
 };
 
 module.exports = {

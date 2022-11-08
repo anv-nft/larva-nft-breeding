@@ -78,6 +78,22 @@
       color: #FFF;
       margin: 0 auto;
       margin-bottom: 3rem;
+      h3{
+        font-size: 30px;
+        color: #f5af00;
+        border: 3px solid #f5af00;
+        width: 500px;
+        margin: 30px auto 0;
+        padding: 20px;
+        span{
+          display: inline-block;
+          margin-top: 20px;
+          font-size: 50px;
+          color :#f5af00;
+          font-family: Poppins;
+          font-weight: 700;
+        }
+      }
     }
 
     .select_view_box {
