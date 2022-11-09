@@ -83,7 +83,7 @@ function LarvaNFTBreeding(props) {
     const searchTokenIdInput = useRef(); // 타임 검색용 토큰 ID
     const [searchTokenId, setSearchTokenId] = useState(""); // 타임 검색용 토큰 ID
     const [coolTime, setCoolTime] = useState(null); // 남은시간
-    const [legendaryCount, setLegendaryCount] = useState(200); // 남은시간
+    const [legendaryCount, setLegendaryCount] = useState(0); // 남은시간
     // 숫자인지 체크
     const numberCheck = (e) => {
         const regex = /^[0-9\b -]{0,13}$/;
@@ -313,21 +313,21 @@ function LarvaNFTBreeding(props) {
         setInterval(drawTime, 1000);
     }, []);
 
-    useEffect(() => {
-        if(dataContract){
-            async function getLegendaryCount() {
-                try {
-                    const count = await dataContract.methods.getAmount(1).call();
-                    setLegendaryCount(200 - count);
-                } catch (e) {
-                    console.log(e);
-                    return false
-                }
-                return false
-            }
-            getLegendaryCount();
-        }
-    }, [dataContract]);
+    // useEffect(() => {
+    //     if(dataContract){
+    //         async function getLegendaryCount() {
+    //             try {
+    //                 const count = await dataContract.methods.getAmount(1).call();
+    //                 setLegendaryCount(200 - count);
+    //             } catch (e) {
+    //                 console.log(e);
+    //                 return false
+    //             }
+    //             return false
+    //         }
+    //         getLegendaryCount();
+    //     }
+    // }, [dataContract]);
 
     return (
         <>
