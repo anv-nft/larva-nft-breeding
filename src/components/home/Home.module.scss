@@ -162,6 +162,25 @@
       > .num::after {
       }
     }
+    .progress{
+      .num > span {
+        display: none;
+      }
+
+      > .num::after {
+        content: "";
+        position: absolute;
+        background: url(../../assets/images/home/roadmap_progress_char1.png) no-repeat center center / cover;
+        width: 113%;
+        height: 116%;
+        left: -8%;
+        top: -8%;
+        margin-top: 1px;
+      }
+
+      > .num::after {
+      }
+    }
 
     .item {
       width: 390px;

@@ -136,7 +136,7 @@ export default function Home(props) {
                             </div>
                         </div>
                     </div>
-                    <div data-aos="flip-right" className={`${styles.item} `}>
+                    <div data-aos="flip-right" className={`${styles.item} ${styles.complete}`}>
                         <p className={styles.num}><span>02</span></p>
                         <div className={styles.box}>
                             <div>
@@ -144,7 +144,7 @@ export default function Home(props) {
                             </div>
                         </div>
                     </div>
-                    <div data-aos="flip-right" className={`${styles.item} `}>
+                    <div data-aos="flip-right" className={`${styles.item} ${styles.progress}`}>
                         <p className={styles.num}><span>03</span></p>
                         <div className={styles.box}>
                             <div>
@@ -160,7 +160,7 @@ export default function Home(props) {
                             </div>
                         </div>
                     </div>
-                    <div data-aos="flip-right" className={`${styles.item} `}>
+                    <div data-aos="flip-right" className={`${styles.item} ${styles.complete}`}>
                         <p className={styles.num}><span>05</span></p>
                         <div className={styles.box}>
                             <div>
